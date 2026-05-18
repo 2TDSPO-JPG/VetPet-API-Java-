@@ -41,6 +41,13 @@ public class Pet {
     private List<Tutor> tutores = new java.util.ArrayList<>();
     @Column
     private LocalDateTime ultimoAcessoTutor;
+    @OneToMany(
+            mappedBy = "pet",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonIgnore
+    private List<Exames> exames;
 
     @PrePersist
     public void gerarPetCode(){

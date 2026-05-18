@@ -1,9 +1,6 @@
 package com.challenger.sprint.javaspg.exception.handler;
 
-import com.challenger.sprint.javaspg.exception.execptions.DadoExistenteException;
-import com.challenger.sprint.javaspg.exception.execptions.EntidadeNaoPersistidaException;
-import com.challenger.sprint.javaspg.exception.execptions.LoginException;
-import com.challenger.sprint.javaspg.exception.execptions.SenhaException;
+import com.challenger.sprint.javaspg.exception.execptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -32,6 +29,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SenhaException.class)
     public ResponseEntity<String> senhaException(SenhaException ex){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(CadastroException.class)
+    public ResponseEntity<CadastroException> cadastroException(CadastroException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex);
     }
 
 }

@@ -40,4 +40,7 @@ public class PetController {
     @DeleteMapping("/deletar-pet-")
     public String deletarPet(@RequestParam Long id){return petService.deletarPet(id);}
 
+    @DeleteMapping("/deletar-pet-code-")
+    public String deletarPetPorPetCode(@RequestParam String petCode){return petService.deletarPetPorPetCode(petCode);}
+
 }

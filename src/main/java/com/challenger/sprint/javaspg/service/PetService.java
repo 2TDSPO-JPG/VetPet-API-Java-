@@ -11,6 +11,7 @@ import com.challenger.sprint.javaspg.exception.execptions.EntidadeNaoPersistidaE
 import com.challenger.sprint.javaspg.repository.PetRepository;
 import com.challenger.sprint.javaspg.repository.TutorRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -88,11 +89,46 @@ public class PetService {
         return PetMapper.toDto(petExistente);
     }
 
+    @Transactional
     public String deletarPet(Long id){
-        Optional<Pet> pet = petRepository.findById(id);
-        if (pet.isEmpty()) throw new EntidadeNaoPersistidaException("Não foi possível encontrar o Pet informado!");
-        petRepository.delete(pet.get());
+
+        Pet pet = petRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntidadeNaoPersistidaException(
+                                "Não foi possível encontrar o Pet informado!"
+                        ));
+        pet.getTutores().forEach(
+                tutor -> tutor.getPets().remove(pet)
+        );
+
+        pet.getTutores().clear();
+        pet.getExames().clear();
+        petRepository.save(pet);
+        petRepository.delete(pet);
+
         return "Pet deletado com sucesso";
     }
 
+    @Transactional
+    public String deletarPetPorPetCode(String petCode) {
+
+        Pet pet = petRepository.findPetByPetCode(petCode);
+
+        if (pet == null){
+            throw new EntidadeNaoPersistidaException(
+                    "Não foi possível encontrar o Pet informado!"
+            );
+        }
+
+        pet.getTutores().forEach(
+                tutor -> tutor.getPets().remove(pet)
+        );
+
+        pet.getTutores().clear();
+        pet.getExames().clear();
+
+        petRepository.save(pet);
+        petRepository.delete(pet);
+        return "Pet deletado com sucesso";
+    }
 }
