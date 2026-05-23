@@ -605,3 +605,7 @@ Desenvolvedor Backend Java especializado em:
 # Licença
 
 Projeto desenvolvido para fins acadêmicos e educacionais.
+
+# Print do SpringInitializer
+
+![img.png](img.png)

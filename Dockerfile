@@ -1,12 +1,14 @@
 FROM eclipse-temurin:21-jdk
 
+RUN useradd -ms /bin/bash appuser
+
 WORKDIR /app
 
-COPY target/javaspg-0.0.1-SNAPSHOT.jar app.jar
+COPY target/*.jar app.jar
 
-RUN useradd -m springuser
+RUN chown -R appuser:appuser /app
 
-USER springuser
+USER appuser
 
 EXPOSE 8080
 
