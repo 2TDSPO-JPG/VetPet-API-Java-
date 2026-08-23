@@ -6,5 +6,6 @@ public record PetRequestUploadDto(
         Long id,
         String name,
         LocalDate dataNascimento,
-        String raca
+        String raca,
+        String tipoAnimal
         ) {}

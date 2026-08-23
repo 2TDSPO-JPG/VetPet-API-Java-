@@ -18,10 +18,13 @@ public class ExamesMapper {
                 .status(exames.getStatus())
                 .nomeDoProfissional(exames.getNomeDoProfissional())
                 .emailTutores(exames.getEmailTutores())
+                .motivo(exames.getMotivo())
+                .petId(exames.getPet() != null ? exames.getPet().getId() : null)
+                .veterinarioId(exames.getVeterinario() != null ? exames.getVeterinario().getId() : null)
                 .build();
     }
 
-    public static ExamesDto toDtoOpn(Optional<Exames> exames){
+    public static ExamesDto toDtoOpn(Optional<Exames> exames) {
         if (exames.isEmpty()) return null;
         Exames examesExistente = exames.get();
         return ExamesDto.builder()
@@ -31,7 +34,9 @@ public class ExamesMapper {
                 .status(examesExistente.getStatus())
                 .nomeDoProfissional(examesExistente.getNomeDoProfissional())
                 .emailTutores(examesExistente.getEmailTutores())
+                .motivo(examesExistente.getMotivo())
+                .petId(examesExistente.getPet() != null ? examesExistente.getPet().getId() : null)
+                .veterinarioId(examesExistente.getVeterinario() != null ? examesExistente.getVeterinario().getId() : null)
                 .build();
     }
-
 }

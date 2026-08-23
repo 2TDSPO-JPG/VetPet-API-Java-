@@ -19,13 +19,20 @@ public class Credencial {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column
     @NotBlank(message = "A senha é obrigatória")
     private String senha;
+
     @OneToOne
     @JoinColumn(name = "vet_tutor_id")
     @ToString.Exclude
     @JsonIgnore
     private Tutor tutor;
 
+    @OneToOne
+    @JoinColumn(name = "vet_veterinario_id")
+    @ToString.Exclude
+    @JsonIgnore
+    private Veterinario veterinario;
 }

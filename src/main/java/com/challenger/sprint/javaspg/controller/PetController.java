@@ -4,8 +4,14 @@ import com.challenger.sprint.javaspg.dto.PetDto;
 import com.challenger.sprint.javaspg.dto.requeste.AfiliarPet;
 import com.challenger.sprint.javaspg.dto.requeste.PetRequestDto;
 import com.challenger.sprint.javaspg.dto.requeste.PetRequestUploadDto;
+import com.challenger.sprint.javaspg.entity.Perguntas;
+import com.challenger.sprint.javaspg.entity.Pet;
 import com.challenger.sprint.javaspg.service.PetService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/pets")
@@ -18,8 +24,9 @@ public class PetController {
     }
 
     @PostMapping("/cadastrar/pet")
-    public PetDto criarPet(@RequestBody PetRequestDto pet){
-        return petService.criarPet(pet);
+    public ResponseEntity<PetDto> cadastrarPet(@RequestBody PetRequestDto dto){
+        PetDto petSalvo = petService.criarPet(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(petSalvo);
     }
 
     @GetMapping("/buscar/pet-code-")
@@ -35,6 +42,12 @@ public class PetController {
     @PutMapping("/atualizar-pet")
     public PetDto atualizarPet(@RequestBody PetRequestUploadDto pet){
         return petService.atualizarPet(pet);
+    }
+
+    @GetMapping("/buscar-por-tutor")
+    public ResponseEntity<List<PetDto>> buscarPetsPorTutor(@RequestParam String email) {
+        List<PetDto> pets = petService.buscarPetsPorTutor(email);
+        return ResponseEntity.ok(pets);
     }
 
     @DeleteMapping("/deletar-pet-")

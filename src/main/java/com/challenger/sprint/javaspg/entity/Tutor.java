@@ -25,7 +25,7 @@ public class Tutor {
     @NotBlank(message = "O nome do tutor é obrigatório")
     private String nome;
 
-    @Column
+    @Column(columnDefinition = "CLOB")
     private String fotoUrl;
 
     @Column(unique = true)

@@ -6,9 +6,13 @@ import com.challenger.sprint.javaspg.service.ExamesService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/exames")
@@ -36,6 +40,14 @@ public class ExamesController {
                 petCode,
                 pageable
         );
+    }
+
+    @GetMapping("/pet-code/list")
+    public ResponseEntity<List<ExamesDto>> buscarExamesPorPetCodeList(
+            @RequestParam String petCode
+    ) {
+        List<ExamesDto> exames = examesService.buscarExamesPorPetCodeList(petCode);
+        return ResponseEntity.ok(exames);
     }
 
     @GetMapping("/data-exame")
@@ -88,6 +100,43 @@ public class ExamesController {
                 nomeDoProfissional,
                 pageable
         );
+    }
+
+    @GetMapping("/veterinario/{veterinarioId}/data")
+    public ResponseEntity<List<ExamesDto>> buscarExamesPorVeterinarioEData(
+            @PathVariable Long veterinarioId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
+
+        List<ExamesDto> exames = examesService.buscarExamesPorVeterinarioEData(veterinarioId, data);
+        return ResponseEntity.ok(exames);
+    }
+
+    @PutMapping("/{id}/cancelar")
+    public ResponseEntity<ExamesDto> cancelarExame(@PathVariable Long id) {
+        ExamesDto exameCancelado = examesService.cancelarExame(id);
+        return ResponseEntity.ok(exameCancelado);
+    }
+
+    @GetMapping("/veterinario/{veterinarioId}")
+    public ResponseEntity<List<ExamesDto>> buscarExamesPorVeterinario(@PathVariable Long veterinarioId) {
+        List<ExamesDto> exames = examesService.buscarExamesPorVeterinario(veterinarioId);
+        return ResponseEntity.ok(exames);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ExamesDto>> buscarTodosExames() {
+        List<ExamesDto> exames = examesService.buscarTodosExames();
+        return ResponseEntity.ok(exames);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ExamesDto> atualizarStatusExame(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> request
+    ) {
+        String status = request.get("status");
+        ExamesDto exameAtualizado = examesService.atualizarStatusExame(id, status);
+        return ResponseEntity.ok(exameAtualizado);
     }
 
 }

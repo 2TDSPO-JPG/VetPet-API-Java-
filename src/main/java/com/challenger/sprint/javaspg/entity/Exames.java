@@ -20,22 +20,31 @@ public class Exames {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column
     private LocalDateTime dataExame;
+
     @Column
     private String petCode;
+
     @Column
     @Enumerated(EnumType.STRING)
     private Status status;
+
     @Column
     private String nomeDoProfissional;
+
     @Column
     private String emailTutores;
+
+    @Column
+    private String motivo;
 
     @ManyToOne
     @JoinColumn(name = "pet_id")
     private Pet pet;
 
-
-
+    @ManyToOne
+    @JoinColumn(name = "veterinario_id")
+    private Veterinario veterinario;
 }

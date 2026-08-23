@@ -57,6 +57,12 @@ public class TutorController {
         return ResponseEntity.ok(tutor);
     }
 
+    @GetMapping("/buscar-por-email")
+    public ResponseEntity<TutorDto> buscarTutorPorEmail(@RequestParam String email) {
+        TutorDto tutor = tutorService.buscarTutorPorEmail(email);
+        return ResponseEntity.ok(tutor);
+    }
+
     @GetMapping
     public ResponseEntity<List<TutorDto>> buscarTodosTutores() {
         List<TutorDto> tutores = tutorService.buscarTodosTutores();
@@ -67,6 +73,12 @@ public class TutorController {
     public ResponseEntity<String> deletarTutor(@RequestParam Long id) {
         String resposta = tutorService.deletarTutor(id);
         return ResponseEntity.ok(resposta);
+    }
+
+    @PutMapping
+    public ResponseEntity<TutorDto> atualizarTutor(@RequestBody Tutor tutor) {
+        TutorDto tutorAtualizado = tutorService.atualizarTutor(tutor);
+        return ResponseEntity.ok(tutorAtualizado);
     }
 
 }

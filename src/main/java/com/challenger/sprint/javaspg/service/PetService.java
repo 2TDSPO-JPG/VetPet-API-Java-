@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PetService {
@@ -35,24 +36,34 @@ public class PetService {
         return PetMapper.toDto(pet);
     }
 
-    public PetDto criarPet(PetRequestDto dto){
-
+    public PetDto criarPet(PetRequestDto dto) {
         List<Tutor> tutores = tutorRepository.findAllById(dto.tutores());
-        Tutor tutorExistente = tutores.get(0);
+
+        if (tutores.isEmpty()) {
+            throw new RuntimeException("Tutor não encontrado");
+        }
+
+        if (tutores.size() != dto.tutores().size()) {
+            throw new RuntimeException("Um ou mais tutores não foram encontrados");
+        }
 
         Pet pet = Pet.builder()
                 .name(dto.name())
                 .dataNascimento(dto.dataNascimento())
                 .raca(dto.raca())
-                .qtdTutores(tutores.size() == 0 ? 0 : tutores.size())
+                .tipoAnimal(dto.tipoAnimal())
+                .qtdTutores(tutores.size())
                 .tutores(tutores)
                 .build();
-        pet.calcularIdade(pet.getDataNascimento());
 
         Pet petSalvo = petRepository.save(pet);
-        tutorExistente.getPets().add(petSalvo);
-        tutorRepository.save(tutorExistente);
-        
+
+        for (Tutor tutor : tutores) {
+            tutor.getPets().add(petSalvo);
+        }
+
+        tutorRepository.saveAll(tutores);
+
         return PetMapper.toDto(petSalvo);
     }
 
@@ -84,6 +95,8 @@ public class PetService {
         petExistente.setName(pet.name());
         petExistente.setDataNascimento(pet.dataNascimento());
         petExistente.setRaca(pet.raca());
+        petExistente.setTipoAnimal(pet.tipoAnimal());
+
 
         petRepository.save(petExistente);
         return PetMapper.toDto(petExistente);
@@ -130,5 +143,24 @@ public class PetService {
         petRepository.save(pet);
         petRepository.delete(pet);
         return "Pet deletado com sucesso";
+    }
+
+    public Pet cadastrar(Pet pet) {
+        // Salva o pet no banco
+        Pet petSalvo = petRepository.save(pet);
+
+        return petSalvo;
+    }
+
+    // No PetService.java
+
+    public List<PetDto> buscarPetsPorTutor(String email) {
+        // Busca o tutor pelo email
+        Tutor tutor = tutorRepository.findByEmail(email)
+                .orElseThrow(() -> new EntidadeNaoPersistidaException("Tutor não encontrado"));
+
+        // Retorna os pets do tutor convertidos para DTO usando o mapper
+        List<Pet> petsDoTutor = tutor.getPets();
+        return PetMapper.toDtoList(petsDoTutor);
     }
 }

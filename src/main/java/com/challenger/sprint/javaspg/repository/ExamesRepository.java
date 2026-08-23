@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface ExamesRepository extends JpaRepository<Exames, Long> {
@@ -16,4 +17,7 @@ public interface ExamesRepository extends JpaRepository<Exames, Long> {
     Page<Exames> findExamesByNomeDoProfissional(String nomeDoProfissional, Pageable pageable);
     Page<Exames> findExamesByEmailTutores(String emailTutores, Pageable pageable);
     Optional<Exames> findFirstByPetCodeAndDataExameAfterOrderByDataExameAsc(String petCode, LocalDateTime dataAtual);
+    List<Exames> findByVeterinarioIdAndDataExameBetween(Long veterinarioId, LocalDateTime inicio, LocalDateTime fim);
+    List<Exames> findByVeterinarioId(Long veterinarioId);
+    List<Exames> findExamesByPetCode(String petCode);
 }

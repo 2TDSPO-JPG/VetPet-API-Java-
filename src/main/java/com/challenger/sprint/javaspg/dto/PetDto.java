@@ -19,6 +19,7 @@ public class PetDto {
     private String petCode;
     private int idade;
     private String raca;
+    private String tipoAnimal;
     private int qtdTutores;
     private List<Long> tutores;
 }

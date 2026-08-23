@@ -19,5 +19,7 @@ public class ExamesDto {
     private Status status;
     private String nomeDoProfissional;
     private String emailTutores;
-
+    private String motivo;
+    private Long petId;
+    private Long veterinarioId;
 }

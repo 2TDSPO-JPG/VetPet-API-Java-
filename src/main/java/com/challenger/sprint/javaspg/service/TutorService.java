@@ -82,6 +82,12 @@ public class TutorService {
         return TutorMapper.toDtoOpn(tutor);
     }
 
+    public TutorDto buscarTutorPorEmail(String email) {
+        Optional<Tutor> tutor = tutorRepository.findByEmail(email);
+        if(tutor.isEmpty()) throw new EntidadeNaoPersistidaException("Tutor não encontrado");
+        return TutorMapper.toDtoOpn(tutor);
+    }
+
     public List<TutorDto> buscarTodosTutores(){
         List<Tutor> tutores = tutorRepository.findAll();
         return TutorMapper.toDtoList(tutores);
@@ -92,6 +98,36 @@ public class TutorService {
         if(tutor.isEmpty()) throw new EntidadeNaoPersistidaException("Tutor nao foi encontrado");
         tutorRepository.delete(tutor.get());
         return "Tutor deletado com sucesso.";
+    }
+
+    public TutorDto atualizarTutor(Tutor tutor) {
+        // Verifica se o tutor existe
+        Optional<Tutor> tutorExistente = tutorRepository.findById(tutor.getId());
+        if (tutorExistente.isEmpty()) {
+            throw new EntidadeNaoPersistidaException("Tutor não encontrado");
+        }
+
+        Tutor tutorAtual = tutorExistente.get();
+
+        // Atualiza os campos
+        tutorAtual.setNome(tutor.getNome());
+        tutorAtual.setEmail(tutor.getEmail());
+        tutorAtual.setCpf(tutor.getCpf());
+        tutorAtual.setTelefone(tutor.getTelefone());
+        tutorAtual.setFotoUrl(tutor.getFotoUrl());
+
+        // Atualiza endereço
+        if (tutor.getEndereco() != null) {
+            tutorAtual.getEndereco().setLogradouro(tutor.getEndereco().getLogradouro());
+            tutorAtual.getEndereco().setNumero(tutor.getEndereco().getNumero());
+            tutorAtual.getEndereco().setComplemento(tutor.getEndereco().getComplemento());
+            tutorAtual.getEndereco().setBairro(tutor.getEndereco().getBairro());
+            tutorAtual.getEndereco().setCidade(tutor.getEndereco().getCidade());
+            tutorAtual.getEndereco().setEstado(tutor.getEndereco().getEstado());
+        }
+
+        Tutor tutorSalvo = tutorRepository.save(tutorAtual);
+        return TutorMapper.toDto(tutorSalvo);
     }
 
 }

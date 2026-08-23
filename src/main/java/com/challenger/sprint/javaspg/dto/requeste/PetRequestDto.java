@@ -8,4 +8,5 @@ public record PetRequestDto(
         String name,
         LocalDate dataNascimento,
         String raca,
+        String tipoAnimal,
         List<Long>tutores) {}
