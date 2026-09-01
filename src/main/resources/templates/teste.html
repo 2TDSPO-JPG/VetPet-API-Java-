@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>classe teste</title>
+</head>
+<body>
+    <h1>Classe de teste</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nome</th>
+                <th>Raça</th>
+                <th>Idade</th>
+                <th>Quantidades de Tutores</th>
+                <th>Data Nascimento</th>
+                <th>Pet Code</th>
+                <th>Ultimo Acesso de Tutor</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="teste : ${pets}">
+                <td th:text="${teste.id}"></td>
+                <td th:text="${teste.name}"></td>
+                <td th:text="${teste.raca}"></td>
+                <td th:text="${teste.idade}"></td>
+                <td th:text="${teste.qtdTutores}"></td>
+                <td th:text="${teste.dataNascimento}"></td>
+                <td th:text="${teste.petCode}"></td>
+                <td th:text="${teste.ultimoAcessoTutor}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
