@@ -47,7 +47,7 @@ public class PetService {
                 .qtdTutores(tutores.size() == 0 ? 0 : tutores.size())
                 .tutores(tutores)
                 .build();
-        pet.calcularIdade(pet.getDataNascimento());
+        pet.calcularIdade();
 
         Pet petSalvo = petRepository.save(pet);
         tutorExistente.getPets().add(petSalvo);
