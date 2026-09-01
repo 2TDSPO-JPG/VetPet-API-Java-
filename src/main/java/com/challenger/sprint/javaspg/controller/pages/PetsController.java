@@ -11,14 +11,21 @@ import java.util.List;
 
 @Controller
 @AllArgsConstructor
-public class testeController {
+public class PetsController {
 
     private final PetService petService;
 
-    @GetMapping("/testes")
-    public String teste(Model model) {
+    @GetMapping("/pets")
+    public String pets(Model model) {
         List<Pet> pets = petService.listarPets();
         model.addAttribute("pets", pets);
-        return "teste";
+        return "pet";
     }
+
+    @GetMapping()
+    public String firstPage(){
+        return "firstpage";
+    }
+
+
 }
