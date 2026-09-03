@@ -72,12 +72,11 @@ public class Pet {
     }
 
     @PreUpdate
-    public void calcularIdade() {  // <-- REMOVA O PARÂMETRO
+    public void calcularIdade() {
         if (this.dataNascimento != null) {
             LocalDate hoje = LocalDate.now();
             int idadeCalculada = hoje.getYear() - this.dataNascimento.getYear();
 
-            // Verifica se já fez aniversário este ano
             if (this.dataNascimento.getMonthValue() > hoje.getMonthValue() ||
                     (this.dataNascimento.getMonthValue() == hoje.getMonthValue() &&
                             this.dataNascimento.getDayOfMonth() > hoje.getDayOfMonth())) {

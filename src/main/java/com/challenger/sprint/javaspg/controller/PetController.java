@@ -44,12 +44,6 @@ public class PetController {
         return petService.atualizarPet(pet);
     }
 
-    @GetMapping("/buscar-por-tutor")
-    public ResponseEntity<List<PetDto>> buscarPetsPorTutor(@RequestParam String email) {
-        List<PetDto> pets = petService.buscarPetsPorTutor(email);
-        return ResponseEntity.ok(pets);
-    }
-
     @DeleteMapping("/deletar-pet-")
     public String deletarPet(@RequestParam Long id){return petService.deletarPet(id);}
 

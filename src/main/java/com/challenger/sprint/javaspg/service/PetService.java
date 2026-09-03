@@ -131,4 +131,8 @@ public class PetService {
         petRepository.delete(pet);
         return "Pet deletado com sucesso";
     }
+
+    public List<Pet> listarPets() {
+        return petRepository.findAll();
+    }
 }

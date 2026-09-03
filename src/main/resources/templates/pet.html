@@ -26,7 +26,7 @@
                 <td th:text="${teste.id}"></td>
                 <td th:text="${teste.name}"></td>
                 <td th:text="${teste.raca}"></td>
-                <td th:text="${teste.idade}"></td>
+                <td th:text="${teste.idade > 0 ? teste.idade : 'Meses'}"></td>
                 <td th:text="${teste.qtdTutores}"></td>
                 <td th:text="${teste.dataNascimento}"></td>
                 <td th:text="${teste.petCode}"></td>

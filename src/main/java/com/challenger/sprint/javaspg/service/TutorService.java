@@ -8,8 +8,10 @@ import com.challenger.sprint.javaspg.exception.execptions.DadoExistenteException
 import com.challenger.sprint.javaspg.exception.execptions.EntidadeNaoPersistidaException;
 import com.challenger.sprint.javaspg.exception.execptions.LoginException;
 import com.challenger.sprint.javaspg.exception.execptions.SenhaException;
+import com.challenger.sprint.javaspg.repository.PetRepository;
 import com.challenger.sprint.javaspg.repository.TutorRepository;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,13 +19,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class TutorService {
 
     private final TutorRepository tutorRepository;
-
-    public TutorService(TutorRepository tutorRepository) {
-        this.tutorRepository = tutorRepository;
-    }
+    private final PetRepository petRepository;
 
     public TutorDto login(String email, String senha){
 
@@ -101,7 +101,6 @@ public class TutorService {
     }
 
     public TutorDto atualizarTutor(Tutor tutor) {
-        // Verifica se o tutor existe
         Optional<Tutor> tutorExistente = tutorRepository.findById(tutor.getId());
         if (tutorExistente.isEmpty()) {
             throw new EntidadeNaoPersistidaException("Tutor não encontrado");
@@ -109,14 +108,12 @@ public class TutorService {
 
         Tutor tutorAtual = tutorExistente.get();
 
-        // Atualiza os campos
         tutorAtual.setNome(tutor.getNome());
         tutorAtual.setEmail(tutor.getEmail());
         tutorAtual.setCpf(tutor.getCpf());
         tutorAtual.setTelefone(tutor.getTelefone());
         tutorAtual.setFotoUrl(tutor.getFotoUrl());
 
-        // Atualiza endereço
         if (tutor.getEndereco() != null) {
             tutorAtual.getEndereco().setLogradouro(tutor.getEndereco().getLogradouro());
             tutorAtual.getEndereco().setNumero(tutor.getEndereco().getNumero());
