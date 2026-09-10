@@ -9,11 +9,41 @@ import java.util.Optional;
 public class TutorMapper {
 
     public static TutorDto toDtoOpn(Optional<Tutor> tutor){
-        return TutorDto.builder().id(tutor.get().getId()).nome(tutor.get().getNome()).fotoUrl(tutor.get().getFotoUrl()).cpf(tutor.get().getCpf()).endereco(EnderecoMapper.toDto(Optional.ofNullable(tutor.get().getEndereco()))).email(tutor.get().getEmail()).telefone(tutor.get().getTelefone()).build();
+        return TutorDto.builder()
+                .id(tutor.get().getId())
+                .nome(tutor.get().getNome())
+                .fotoUrl(tutor.get().getFotoUrl())
+                .cpf(tutor.get().getCpf())
+                .endereco(EnderecoMapper.toDto(
+                        Optional.ofNullable(tutor.get().getEndereco())
+                ))
+                .email(tutor.get().getEmail())
+                .telefone(tutor.get().getTelefone())
+                .ultimoAcesso(
+                        tutor.get().getUltimoAcesso() != null
+                                ? tutor.get().getUltimoAcesso().toString()
+                                : null
+                )
+                .build();
     }
 
     public static TutorDto toDto(Tutor tutor){
-        return TutorDto.builder().id(tutor.getId()).nome(tutor.getNome()).fotoUrl(tutor.getFotoUrl()).cpf(tutor.getCpf()).endereco(EnderecoMapper.toDto(Optional.ofNullable(tutor.getEndereco()))).email(tutor.getEmail()).telefone(tutor.getTelefone()).build();
+        return TutorDto.builder()
+                .id(tutor.getId())
+                .nome(tutor.getNome())
+                .fotoUrl(tutor.getFotoUrl())
+                .cpf(tutor.getCpf())
+                .endereco(EnderecoMapper.toDto(
+                        Optional.ofNullable(tutor.getEndereco())
+                ))
+                .email(tutor.getEmail())
+                .telefone(tutor.getTelefone())
+                .ultimoAcesso(
+                        tutor.getUltimoAcesso() != null
+                                ? tutor.getUltimoAcesso().toString()
+                                : null
+                )
+                .build();
     }
 
     public static List<TutorDto> toDtoList(List<Tutor> tutores){

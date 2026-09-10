@@ -133,4 +133,5 @@ public class VeterinarioService {
         Veterinario existente = buscarPorId(id);
         veterinarioRepository.delete(existente);
     }
+
 }

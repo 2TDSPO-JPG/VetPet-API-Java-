@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,10 +50,7 @@ public class Pet {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "pets")
-    private List<Tutor> tutores = new java.util.ArrayList<>();
-
-    @Column
-    private LocalDateTime ultimoAcessoTutor;
+    private List<Tutor> tutores = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "pet",
@@ -66,20 +63,28 @@ public class Pet {
     @PrePersist
     public void gerarPetCode() {
         if (this.petCode == null || this.petCode.isEmpty()) {
-            this.petCode = "PET-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+            this.petCode = "PET-" +
+                    UUID.randomUUID()
+                            .toString()
+                            .substring(0, 8)
+                            .toUpperCase();
         }
-        calcularIdade(); // Chama o cálculo da idade
+
+        calcularIdade();
     }
 
     @PreUpdate
     public void calcularIdade() {
         if (this.dataNascimento != null) {
             LocalDate hoje = LocalDate.now();
-            int idadeCalculada = hoje.getYear() - this.dataNascimento.getYear();
 
-            if (this.dataNascimento.getMonthValue() > hoje.getMonthValue() ||
-                    (this.dataNascimento.getMonthValue() == hoje.getMonthValue() &&
-                            this.dataNascimento.getDayOfMonth() > hoje.getDayOfMonth())) {
+            int idadeCalculada =
+                    hoje.getYear() - this.dataNascimento.getYear();
+
+            if (this.dataNascimento.getMonthValue() > hoje.getMonthValue()
+                    || (this.dataNascimento.getMonthValue() == hoje.getMonthValue()
+                    && this.dataNascimento.getDayOfMonth() > hoje.getDayOfMonth())) {
+
                 idadeCalculada--;
             }
 

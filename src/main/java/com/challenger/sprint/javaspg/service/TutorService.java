@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import com.challenger.sprint.javaspg.entity.Endereco;
+
 @Service
 @AllArgsConstructor
 public class TutorService {
@@ -115,12 +117,63 @@ public class TutorService {
         tutorAtual.setFotoUrl(tutor.getFotoUrl());
 
         if (tutor.getEndereco() != null) {
-            tutorAtual.getEndereco().setLogradouro(tutor.getEndereco().getLogradouro());
-            tutorAtual.getEndereco().setNumero(tutor.getEndereco().getNumero());
-            tutorAtual.getEndereco().setComplemento(tutor.getEndereco().getComplemento());
-            tutorAtual.getEndereco().setBairro(tutor.getEndereco().getBairro());
-            tutorAtual.getEndereco().setCidade(tutor.getEndereco().getCidade());
-            tutorAtual.getEndereco().setEstado(tutor.getEndereco().getEstado());
+
+            if (tutorAtual.getEndereco() == null) {
+
+                Endereco novoEndereco = new Endereco();
+
+                novoEndereco.setLogradouro(
+                        tutor.getEndereco().getLogradouro()
+                );
+
+                novoEndereco.setNumero(
+                        tutor.getEndereco().getNumero()
+                );
+
+                novoEndereco.setComplemento(
+                        tutor.getEndereco().getComplemento()
+                );
+
+                novoEndereco.setBairro(
+                        tutor.getEndereco().getBairro()
+                );
+
+                novoEndereco.setCidade(
+                        tutor.getEndereco().getCidade()
+                );
+
+                novoEndereco.setEstado(
+                        tutor.getEndereco().getEstado()
+                );
+
+                tutorAtual.setEndereco(novoEndereco);
+
+            } else {
+
+                tutorAtual.getEndereco().setLogradouro(
+                        tutor.getEndereco().getLogradouro()
+                );
+
+                tutorAtual.getEndereco().setNumero(
+                        tutor.getEndereco().getNumero()
+                );
+
+                tutorAtual.getEndereco().setComplemento(
+                        tutor.getEndereco().getComplemento()
+                );
+
+                tutorAtual.getEndereco().setBairro(
+                        tutor.getEndereco().getBairro()
+                );
+
+                tutorAtual.getEndereco().setCidade(
+                        tutor.getEndereco().getCidade()
+                );
+
+                tutorAtual.getEndereco().setEstado(
+                        tutor.getEndereco().getEstado()
+                );
+            }
         }
 
         Tutor tutorSalvo = tutorRepository.save(tutorAtual);

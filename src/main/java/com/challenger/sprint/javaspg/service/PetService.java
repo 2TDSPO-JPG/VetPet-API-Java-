@@ -38,18 +38,26 @@ public class PetService {
     public PetDto criarPet(PetRequestDto dto){
 
         List<Tutor> tutores = tutorRepository.findAllById(dto.tutores());
+
+        if (tutores.isEmpty()) {
+            throw new EntidadeNaoPersistidaException("Tutor não encontrado");
+        }
+
         Tutor tutorExistente = tutores.get(0);
 
         Pet pet = Pet.builder()
                 .name(dto.name())
                 .dataNascimento(dto.dataNascimento())
                 .raca(dto.raca())
-                .qtdTutores(tutores.size() == 0 ? 0 : tutores.size())
+                .tipoAnimal(dto.tipoAnimal())
+                .qtdTutores(tutores.size())
                 .tutores(tutores)
                 .build();
-        pet.calcularIdade();
 
         Pet petSalvo = petRepository.save(pet);
+        if (tutorExistente.getPets() == null) {
+            tutorExistente.setPets(new java.util.ArrayList<>());
+        }
         tutorExistente.getPets().add(petSalvo);
         tutorRepository.save(tutorExistente);
         
@@ -84,25 +92,32 @@ public class PetService {
         petExistente.setName(pet.name());
         petExistente.setDataNascimento(pet.dataNascimento());
         petExistente.setRaca(pet.raca());
+        petExistente.setTipoAnimal(pet.tipoAnimal());
 
         petRepository.save(petExistente);
         return PetMapper.toDto(petExistente);
     }
 
     @Transactional
-    public String deletarPet(Long id){
+    public String deletarPet(Long id) {
 
         Pet pet = petRepository.findById(id)
                 .orElseThrow(() ->
                         new EntidadeNaoPersistidaException(
                                 "Não foi possível encontrar o Pet informado!"
-                        ));
+                        )
+                );
+
         pet.getTutores().forEach(
                 tutor -> tutor.getPets().remove(pet)
         );
 
         pet.getTutores().clear();
-        pet.getExames().clear();
+
+        if (pet.getExames() != null) {
+            pet.getExames().clear();
+        }
+
         petRepository.save(pet);
         petRepository.delete(pet);
 

@@ -1,9 +1,9 @@
 package com.challenger.sprint.javaspg.dto;
 
-import jakarta.persistence.Column;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -11,15 +11,25 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString
 public class PetDto {
+
     private Long id;
+
     private String name;
-    private LocalDate dataNascimento;
+
     private String petCode;
+
+    private LocalDate dataNascimento;
+
     private int idade;
+
     private String raca;
+
     private String tipoAnimal;
+
     private int qtdTutores;
+
     private List<Long> tutores;
+
+    private LocalDateTime ultimoAcessoTutor;
 }

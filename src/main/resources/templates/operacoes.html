@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Operações - VetPet</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 30px;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        h3 {
+            margin-top: 25px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .campo {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .campo label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .campo input,
+        .campo select,
+        .campo textarea {
+            padding: 9px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .campo textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .campo-completo {
+            grid-column: 1 / -1;
+        }
+
+        button {
+            padding: 9px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-criar {
+            background: #198754;
+            color: white;
+        }
+
+        .btn-atualizar {
+            background: #0d6efd;
+            color: white;
+        }
+
+        .btn-deletar {
+            background: #dc3545;
+            color: white;
+        }
+
+        .mensagem-sucesso {
+            background: #d1e7dd;
+            color: #0f5132;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .mensagem-erro {
+            background: #f8d7da;
+            color: #842029;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .tabela-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #eee;
+        }
+
+        .form-tabela {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 230px;
+        }
+
+        .form-tabela input,
+        .form-tabela textarea {
+            padding: 7px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .linha-botoes {
+            display: flex;
+            gap: 8px;
+        }
+
+        .separador {
+            margin: 30px 0;
+            border: 0;
+            border-top: 1px solid #ddd;
+        }
+
+        .observacao {
+            color: #666;
+            font-size: 14px;
+        }
+
+        @media (max-width: 900px) {
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .campo-completo {
+                grid-column: auto;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Operações</h1>
+
+    <p class="observacao">
+        Todas as operações desta página são realizadas pelo Controller,
+        Service e Repository.
+    </p>
+
+
+    <div
+            class="mensagem-sucesso"
+            th:if="${sucesso != null}"
+            th:text="${sucesso}">
+    </div>
+
+    <div
+            class="mensagem-erro"
+            th:if="${erro != null}"
+            th:text="${erro}">
+    </div>
+
+
+
+    <div class="card">
+
+        <h2>Pets</h2>
+
+        <h3>Cadastrar Pet</h3>
+
+        <form
+                th:action="@{/operacoes/pets/criar}"
+                method="post">
+
+            <input
+                    type="hidden"
+                    th:name="${_csrf.parameterName}"
+                    th:value="${_csrf.token}">
+
+            <div class="form-grid">
+
+                <div class="campo">
+
+                    <label for="pet-name">
+                        Nome
+                    </label>
+
+                    <input
+                            id="pet-name"
+                            type="text"
+                            name="name"
+                            required>
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="pet-data">
+                        Data de nascimento
+                    </label>
+
+                    <input
+                            id="pet-data"
+                            type="date"
+                            name="dataNascimento"
+                            required>
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="pet-raca">
+                        Raça
+                    </label>
+
+                    <input
+                            id="pet-raca"
+                            type="text"
+                            name="raca">
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="pet-tipo">
+                        Tipo de animal
+                    </label>
+
+                    <input
+                            id="pet-tipo"
+                            type="text"
+                            name="tipoAnimal">
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="pet-tutor">
+                        Tutor
+                    </label>
+
+                    <select
+                            id="pet-tutor"
+                            name="tutorId"
+                            required>
+
+                        <option value="">
+                            Selecione um tutor
+                        </option>
+
+                        <option
+                                th:each="tutor : ${tutores}"
+                                th:value="${tutor.id}"
+                                th:text="${tutor.id + ' - ' + tutor.nome}">
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="campo">
+
+                    <label>&nbsp;</label>
+
+                    <button
+                            type="submit"
+                            class="btn-criar">
+
+                        Cadastrar Pet
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+
+        <hr class="separador">
+
+
+        <h3>Pets cadastrados</h3>
+
+        <div class="tabela-container">
+
+            <table>
+
+                <thead>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Data nascimento</th>
+                    <th>Raça</th>
+                    <th>Tipo</th>
+                    <th>Pet Code</th>
+                    <th>Idade</th>
+                    <th>Ações</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <tr th:each="pet : ${pets}">
+
+                    <td th:text="${pet.id}">
+                    </td>
+
+                    <td th:text="${pet.name}">
+                    </td>
+
+                    <td th:text="${pet.dataNascimento}">
+                    </td>
+
+                    <td th:text="${pet.raca}">
+                    </td>
+
+                    <td th:text="${pet.tipoAnimal}">
+                    </td>
+
+                    <td th:text="${pet.petCode}">
+                    </td>
+
+                    <td th:text="${pet.idade}">
+                    </td>
+
+                    <td>
+
+                        <form
+                                class="form-tabela"
+                                th:action="@{/operacoes/pets/atualizar}"
+                                method="post">
+
+                            <input
+                                    type="hidden"
+                                    th:name="${_csrf.parameterName}"
+                                    th:value="${_csrf.token}">
+
+                            <input
+                                    type="hidden"
+                                    name="id"
+                                    th:value="${pet.id}">
+
+                            <input
+                                    type="text"
+                                    name="name"
+                                    th:value="${pet.name}"
+                                    placeholder="Nome"
+                                    required>
+
+                            <input
+                                    type="date"
+                                    name="dataNascimento"
+                                    th:value="${pet.dataNascimento}"
+                                    required>
+
+                            <input
+                                    type="text"
+                                    name="raca"
+                                    th:value="${pet.raca}"
+                                    placeholder="Raça">
+
+                            <input
+                                    type="text"
+                                    name="tipoAnimal"
+                                    th:value="${pet.tipoAnimal}"
+                                    placeholder="Tipo">
+
+                            <button
+                                    type="submit"
+                                    class="btn-atualizar">
+
+                                Atualizar
+
+                            </button>
+
+                        </form>
+
+
+                        <form
+                                class="form-tabela"
+                                th:action="@{/operacoes/pets/deletar}"
+                                method="post"
+                                style="margin-top: 10px;">
+
+                            <input
+                                    type="hidden"
+                                    th:name="${_csrf.parameterName}"
+                                    th:value="${_csrf.token}">
+
+                            <input
+                                    type="hidden"
+                                    name="id"
+                                    th:value="${pet.id}">
+
+                            <button
+                                    type="submit"
+                                    class="btn-deletar">
+
+                                Deletar
+
+                            </button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(pets)}">
+
+                    <td
+                            colspan="8"
+                            style="text-align: center;">
+
+                        Nenhum pet cadastrado.
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="card">
+
+        <h2>Tutores</h2>
+
+        <h3>Cadastrar Tutor</h3>
+
+        <form
+                th:action="@{/operacoes/tutores/criar}"
+                method="post">
+
+            <input
+                    type="hidden"
+                    th:name="${_csrf.parameterName}"
+                    th:value="${_csrf.token}">
+
+            <div class="form-grid">
+
+                <div class="campo">
+
+                    <label>Nome</label>
+
+                    <input
+                            type="text"
+                            name="nome"
+                            required>
+
+                </div>
+
+                <div class="campo">
+
+                    <label>CPF</label>
+
+                    <input
+                            type="text"
+                            name="cpf"
+                            required>
+
+                </div>
+
+                <div class="campo">
+
+                    <label>Email</label>
+
+                    <input
+                            type="email"
+                            name="email"
+                            required>
+
+                </div>
+
+                <div class="campo">
+
+                    <label>Telefone</label>
+
+                    <input
+                            type="text"
+                            name="telefone">
+
+                </div>
+
+                <div class="campo">
+
+                    <label>Foto URL</label>
+
+                    <input
+                            type="text"
+                            name="fotoUrl">
+
+                </div>
+
+                <div class="campo">
+
+                    <label>Senha</label>
+
+                    <input
+                            type="password"
+                            name="senha"
+                            required>
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>Logradouro</label>
+
+                    <input
+                            type="text"
+                            name="logradouro">
+
+                </div>
+
+                <div class="campo">
+
+                    <label>Número</label>
+
+                    <input
+                            type="text"
+                            name="numero">
+
+                </div>
+
+                <div class="campo">
+
+                    <label>Complemento</label>
+
+                    <input
+                            type="text"
+                            name="complemento">
+
+                </div>
+
+                <div class="campo">
+
+                    <label>Bairro</label>
+
+                    <input
+                            type="text"
+                            name="bairro">
+
+                </div>
+
+                <div class="campo">
+
+                    <label>Cidade</label>
+
+                    <input
+                            type="text"
+                            name="cidade">
+
+                </div>
+
+                <div class="campo">
+
+                    <label>Estado</label>
+
+                    <input
+                            type="text"
+                            name="estado">
+
+                </div>
+
+                <div class="campo">
+
+                    <label>&nbsp;</label>
+
+                    <button
+                            type="submit"
+                            class="btn-criar">
+
+                        Cadastrar Tutor
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+
+        <hr class="separador">
+
+
+        <h3>Tutores cadastrados</h3>
+
+        <div class="tabela-container">
+
+            <table>
+
+                <thead>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>CPF</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Ações</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <tr th:each="tutor : ${tutores}">
+
+                    <td th:text="${tutor.id}">
+                    </td>
+
+                    <td th:text="${tutor.nome}">
+                    </td>
+
+                    <td th:text="${tutor.cpf}">
+                    </td>
+
+                    <td th:text="${tutor.email}">
+                    </td>
+
+                    <td th:text="${tutor.telefone}">
+                    </td>
+
+                    <td>
+
+                        <form
+                                class="form-tabela"
+                                th:action="@{/operacoes/tutores/atualizar}"
+                                method="post">
+
+                            <input
+                                    type="hidden"
+                                    th:name="${_csrf.parameterName}"
+                                    th:value="${_csrf.token}">
+
+                            <input
+                                    type="hidden"
+                                    name="id"
+                                    th:value="${tutor.id}">
+
+                            <input
+                                    type="text"
+                                    name="nome"
+                                    th:value="${tutor.nome}"
+                                    placeholder="Nome"
+                                    required>
+
+                            <input
+                                    type="text"
+                                    name="cpf"
+                                    th:value="${tutor.cpf}"
+                                    placeholder="CPF"
+                                    required>
+
+                            <input
+                                    type="email"
+                                    name="email"
+                                    th:value="${tutor.email}"
+                                    placeholder="Email"
+                                    required>
+
+                            <input
+                                    type="text"
+                                    name="telefone"
+                                    th:value="${tutor.telefone}"
+                                    placeholder="Telefone">
+
+                            <input
+                                    type="text"
+                                    name="fotoUrl"
+                                    th:value="${tutor.fotoUrl}"
+                                    placeholder="Foto URL">
+
+                            <button
+                                    type="submit"
+                                    class="btn-atualizar">
+
+                                Atualizar
+
+                            </button>
+
+                        </form>
+
+
+                        <form
+                                class="form-tabela"
+                                th:action="@{/operacoes/tutores/deletar}"
+                                method="post"
+                                style="margin-top: 10px;">
+
+                            <input
+                                    type="hidden"
+                                    th:name="${_csrf.parameterName}"
+                                    th:value="${_csrf.token}">
+
+                            <input
+                                    type="hidden"
+                                    name="id"
+                                    th:value="${tutor.id}">
+
+                            <button
+                                    type="submit"
+                                    class="btn-deletar">
+
+                                Deletar
+
+                            </button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(tutores)}">
+
+                    <td
+                            colspan="6"
+                            style="text-align: center;">
+
+                        Nenhum tutor cadastrado.
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="card">
+
+        <h2>Veterinários</h2>
+
+        <h3>Cadastrar Veterinário</h3>
+
+        <form
+                th:action="@{/operacoes/veterinarios/criar}"
+                method="post">
+
+            <input
+                    type="hidden"
+                    th:name="${_csrf.parameterName}"
+                    th:value="${_csrf.token}">
+
+            <div class="form-grid">
+
+                <div class="campo">
+
+                    <label>Nome</label>
+
+                    <input
+                            type="text"
+                            name="nome"
+                            required>
+
+                </div>
+
+                <div class="campo">
+
+                    <label>CRMV</label>
+
+                    <input
+                            type="text"
+                            name="crmv"
+                            required>
+
+                </div>
+
+                <div class="campo">
+
+                    <label>Email</label>
+
+                    <input
+                            type="email"
+                            name="email"
+                            required>
+
+                </div>
+
+                <div class="campo">
+
+                    <label>CPF</label>
+
+                    <input
+                            type="text"
+                            name="cpf">
+
+                </div>
+
+                <div class="campo">
+
+                    <label>Telefone</label>
+
+                    <input
+                            type="text"
+                            name="telefone">
+
+                </div>
+
+                <div class="campo">
+
+                    <label>Especialidade</label>
+
+                    <input
+                            type="text"
+                            name="especialidade">
+
+                </div>
+
+                <div class="campo">
+
+                    <label>Experiência</label>
+
+                    <input
+                            type="text"
+                            name="experiencia">
+
+                </div>
+
+                <div class="campo">
+
+                    <label>Foto URL</label>
+
+                    <input
+                            type="text"
+                            name="fotoUrl">
+
+                </div>
+
+                <div class="campo">
+
+                    <label>Senha</label>
+
+                    <input
+                            type="password"
+                            name="senha"
+                            required>
+
+                </div>
+
+                <div class="campo campo-completo">
+
+                    <label>Biografia</label>
+
+                    <textarea
+                            name="biografia">
+                    </textarea>
+
+                </div>
+
+                <div class="campo">
+
+                    <label>&nbsp;</label>
+
+                    <button
+                            type="submit"
+                            class="btn-criar">
+
+                        Cadastrar Veterinário
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+
+        <hr class="separador">
+
+
+        <h3>Veterinários cadastrados</h3>
+
+        <div class="tabela-container">
+
+            <table>
+
+                <thead>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>CRMV</th>
+                    <th>Email</th>
+                    <th>CPF</th>
+                    <th>Telefone</th>
+                    <th>Especialidade</th>
+                    <th>Experiência</th>
+                    <th>Ações</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <tr th:each="veterinario : ${veterinarios}">
+
+                    <td th:text="${veterinario.id}">
+                    </td>
+
+                    <td th:text="${veterinario.nome}">
+                    </td>
+
+                    <td th:text="${veterinario.crmv}">
+                    </td>
+
+                    <td th:text="${veterinario.email}">
+                    </td>
+
+                    <td th:text="${veterinario.cpf}">
+                    </td>
+
+                    <td th:text="${veterinario.telefone}">
+                    </td>
+
+                    <td th:text="${veterinario.especialidade}">
+                    </td>
+
+                    <td th:text="${veterinario.experiencia}">
+                    </td>
+
+                    <td>
+
+                        <form
+                                class="form-tabela"
+                                th:action="@{/operacoes/veterinarios/atualizar}"
+                                method="post">
+
+                            <input
+                                    type="hidden"
+                                    th:name="${_csrf.parameterName}"
+                                    th:value="${_csrf.token}">
+
+                            <input
+                                    type="hidden"
+                                    name="id"
+                                    th:value="${veterinario.id}">
+
+                            <input
+                                    type="text"
+                                    name="nome"
+                                    th:value="${veterinario.nome}"
+                                    placeholder="Nome"
+                                    required>
+
+                            <input
+                                    type="text"
+                                    name="crmv"
+                                    th:value="${veterinario.crmv}"
+                                    placeholder="CRMV"
+                                    required>
+
+                            <input
+                                    type="email"
+                                    name="email"
+                                    th:value="${veterinario.email}"
+                                    placeholder="Email"
+                                    required>
+
+                            <input
+                                    type="text"
+                                    name="cpf"
+                                    th:value="${veterinario.cpf}"
+                                    placeholder="CPF">
+
+                            <input
+                                    type="text"
+                                    name="telefone"
+                                    th:value="${veterinario.telefone}"
+                                    placeholder="Telefone">
+
+                            <input
+                                    type="text"
+                                    name="especialidade"
+                                    th:value="${veterinario.especialidade}"
+                                    placeholder="Especialidade">
+
+                            <input
+                                    type="text"
+                                    name="experiencia"
+                                    th:value="${veterinario.experiencia}"
+                                    placeholder="Experiência">
+
+                            <input
+                                    type="text"
+                                    name="fotoUrl"
+                                    th:value="${veterinario.fotoUrl}"
+                                    placeholder="Foto URL">
+
+                            <input
+                                    type="password"
+                                    name="senha"
+                                    placeholder="Nova senha (opcional)">
+
+                            <textarea
+                                    name="biografia"
+                                    placeholder="Biografia"
+                                    th:text="${veterinario.biografia}">
+                            </textarea>
+
+                            <button
+                                    type="submit"
+                                    class="btn-atualizar">
+
+                                Atualizar
+
+                            </button>
+
+                        </form>
+
+
+                        <form
+                                class="form-tabela"
+                                th:action="@{/operacoes/veterinarios/deletar}"
+                                method="post"
+                                style="margin-top: 10px;">
+
+                            <input
+                                    type="hidden"
+                                    th:name="${_csrf.parameterName}"
+                                    th:value="${_csrf.token}">
+
+                            <input
+                                    type="hidden"
+                                    name="id"
+                                    th:value="${veterinario.id}">
+
+                            <button
+                                    type="submit"
+                                    class="btn-deletar">
+
+                                Deletar
+
+                            </button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(veterinarios)}">
+
+                    <td
+                            colspan="9"
+                            style="text-align: center;">
+
+                        Nenhum veterinário cadastrado.
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

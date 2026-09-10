@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Consultas - VetPet</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 30px;
+            background: #f5f5f5;
+            color: #212529;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #666;
+        }
+
+        /* ========================= */
+        /* CARD */
+        /* ========================= */
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        /* ========================= */
+        /* FILTRO */
+        /* ========================= */
+
+        .filtro {
+            display: flex;
+            align-items: end;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .campo label {
+            font-weight: bold;
+        }
+
+        .campo select {
+            min-width: 250px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: white;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .btn-filtrar {
+            background: #0d6efd;
+            color: white;
+        }
+
+        .btn-filtrar:hover {
+            background: #0b5ed7;
+        }
+
+        /* ========================= */
+        /* TABELA */
+        /* ========================= */
+
+        .tabela-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 11px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #eee;
+            font-weight: bold;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        tbody tr:hover {
+            background: #f1f1f1;
+        }
+
+        /* ========================= */
+        /* TÍTULO DA SEÇÃO */
+        /* ========================= */
+
+        .titulo-secao {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .titulo-secao h2 {
+            margin: 0;
+        }
+
+        .quantidade {
+            background: #e9ecef;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        /* ========================= */
+        /* VAZIO */
+        /* ========================= */
+
+        .nenhum-registro {
+            text-align: center;
+            padding: 25px;
+            color: #777;
+        }
+
+        /* ========================= */
+        /* RESPONSIVIDADE */
+        /* ========================= */
+
+        @media (max-width: 700px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            .filtro {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .campo select {
+                width: 100%;
+            }
+
+            .btn-filtrar {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Consultas</h1>
+
+    <p>
+        Consulte os dados cadastrados no sistema VetPet.
+    </p>
+
+
+    <!-- ========================= -->
+    <!-- FILTRO -->
+    <!-- ========================= -->
+
+    <div class="card">
+
+        <form
+                action="/consulta"
+                method="get"
+                class="filtro">
+
+            <div class="campo">
+
+                <label for="tipo">
+                    Tipo de entidade:
+                </label>
+
+                <select
+                        name="tipo"
+                        id="tipo">
+
+                    <option
+                            value="todos"
+                            th:selected="${tipo == 'todos'}">
+
+                        Todos
+
+                    </option>
+
+                    <option
+                            value="pets"
+                            th:selected="${tipo == 'pets'}">
+
+                        Pets
+
+                    </option>
+
+                    <option
+                            value="tutores"
+                            th:selected="${tipo == 'tutores'}">
+
+                        Tutores
+
+                    </option>
+
+                    <option
+                            value="veterinarios"
+                            th:selected="${tipo == 'veterinarios'}">
+
+                        Veterinários
+
+                    </option>
+
+                </select>
+
+            </div>
+
+            <button
+                    type="submit"
+                    class="btn-filtrar">
+
+                Filtrar
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- PETS -->
+    <!-- ========================= -->
+
+    <div
+            class="card"
+            th:if="${tipo == 'pets' or tipo == 'todos'}">
+
+        <div class="titulo-secao">
+
+            <h2>Pets</h2>
+
+            <span
+                    class="quantidade"
+                    th:if="${pets != null}"
+                    th:text="${#lists.size(pets) + ' registro(s)'}">
+
+            </span>
+
+        </div>
+
+        <div class="tabela-container">
+
+            <table>
+
+                <thead>
+
+                <tr>
+
+                    <th>Id</th>
+
+                    <th>Nome</th>
+
+                    <th>Raça</th>
+
+                    <th>Idade</th>
+
+                    <th>Quantidade de Tutores</th>
+
+                    <th>Data Nascimento</th>
+
+                    <th>Tipo</th>
+
+                    <th>Pet Code</th>
+
+                    <th>Último Acesso do Tutor</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <tr th:each="pet : ${pets}">
+
+                    <td th:text="${pet.id}">
+                    </td>
+
+                    <td th:text="${pet.name}">
+                    </td>
+
+                    <td th:text="${pet.raca}">
+                    </td>
+
+                    <td th:text="${pet.idade > 0 ? pet.idade : 'Meses'}">
+                    </td>
+
+                    <td th:text="${pet.qtdTutores}">
+                    </td>
+
+                    <td th:text="${pet.dataNascimento}">
+                    </td>
+
+                    <td th:text="${pet.tipoAnimal}">
+                    </td>
+
+                    <td th:text="${pet.petCode}">
+                    </td>
+
+                    <td th:text="${pet.ultimoAcessoTutor != null
+        ? #temporals.format(pet.ultimoAcessoTutor, 'dd/MM/yyyy HH:mm')
+        : 'Nunca acessou'}">
+                    </td>
+                    </td>
+
+                </tr>
+
+                <tr th:if="${pets == null or #lists.isEmpty(pets)}">
+
+                    <td
+                            colspan="8"
+                            class="nenhum-registro">
+
+                        Nenhum pet encontrado.
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- TUTORES -->
+    <!-- ========================= -->
+
+    <div
+            class="card"
+            th:if="${tipo == 'tutores' or tipo == 'todos'}">
+
+        <div class="titulo-secao">
+
+            <h2>Tutores</h2>
+
+            <span
+                    class="quantidade"
+                    th:if="${tutores != null}"
+                    th:text="${#lists.size(tutores) + ' registro(s)'}">
+
+            </span>
+
+        </div>
+
+        <div class="tabela-container">
+
+            <table>
+
+                <thead>
+
+                <tr>
+
+                    <th>Id</th>
+
+                    <th>Nome</th>
+
+                    <th>CPF</th>
+
+                    <th>Email</th>
+
+                    <th>Telefone</th>
+
+                    <th>Último Acesso</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <tr th:each="tutor : ${tutores}">
+
+                    <td th:text="${tutor.id}">
+                    </td>
+
+                    <td th:text="${tutor.nome}">
+                    </td>
+
+                    <td th:text="${tutor.cpf}">
+                    </td>
+
+                    <td th:text="${tutor.email}">
+                    </td>
+
+                    <td th:text="${tutor.telefone}">
+                    </td>
+
+                    <td th:text="${tutor.ultimoAcesso}">
+                    </td>
+
+                </tr>
+
+                <tr th:if="${tutores == null or #lists.isEmpty(tutores)}">
+
+                    <td
+                            colspan="6"
+                            class="nenhum-registro">
+
+                        Nenhum tutor encontrado.
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- VETERINÁRIOS -->
+    <!-- ========================= -->
+
+    <div
+            class="card"
+            th:if="${tipo == 'veterinarios' or tipo == 'todos'}">
+
+        <div class="titulo-secao">
+
+            <h2>Veterinários</h2>
+
+            <span
+                    class="quantidade"
+                    th:if="${veterinarios != null}"
+                    th:text="${#lists.size(veterinarios) + ' registro(s)'}">
+
+            </span>
+
+        </div>
+
+        <div class="tabela-container">
+
+            <table>
+
+                <thead>
+
+                <tr>
+
+                    <th>Id</th>
+
+                    <th>Nome</th>
+
+                    <th>CRMV</th>
+
+                    <th>Email</th>
+
+                    <th>Telefone</th>
+
+                    <th>Especialidade</th>
+
+                    <th>Experiência</th>
+
+                    <th>Primeiro Login</th>
+
+                    <th>CPF</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <tr th:each="veterinario : ${veterinarios}">
+
+                    <td th:text="${veterinario.id}">
+                    </td>
+
+                    <td th:text="${veterinario.nome}">
+                    </td>
+
+                    <td th:text="${veterinario.crmv}">
+                    </td>
+
+                    <td th:text="${veterinario.email}">
+                    </td>
+
+                    <td th:text="${veterinario.telefone}">
+                    </td>
+
+                    <td th:text="${veterinario.especialidade}">
+                    </td>
+
+                    <td th:text="${veterinario.experiencia}">
+                    </td>
+
+                    <td th:text="${veterinario.primeiroLogin}">
+                    </td>
+
+                    <td th:text="${veterinario.cpf}">
+                    </td>
+
+                </tr>
+
+                <tr th:if="${veterinarios == null or #lists.isEmpty(veterinarios)}">
+
+                    <td
+                            colspan="9"
+                            class="nenhum-registro">
+
+                        Nenhum veterinário encontrado.
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

@@ -1,13 +1,302 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
-    <title>Inicio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>VetPet | Início</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f0fa, #ffffff);
+            color: #333;
+        }
+
+        header {
+            width: 100%;
+            padding: 20px 60px;
+            background-color: #450d73;
+            color: white;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #e99fed;
+        }
+
+        .login-status {
+            font-size: 14px;
+        }
+
+        .container {
+            min-height: calc(100vh - 80px);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 40px;
+        }
+
+        .content {
+            width: 100%;
+            max-width: 1000px;
+            text-align: center;
+        }
+
+        .welcome {
+            margin-bottom: 45px;
+        }
+
+        .welcome h1 {
+            font-size: 42px;
+            color: #450d73;
+            margin-bottom: 15px;
+        }
+
+        .welcome p {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 35px 30px;
+            border-radius: 15px;
+
+            box-shadow: 0 8px 25px rgba(69, 13, 115, 0.12);
+
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(69, 13, 115, 0.20);
+        }
+
+        .icon {
+            font-size: 45px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #450d73;
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .button {
+            display: inline-block;
+
+            padding: 12px 25px;
+
+            background-color: #450d73;
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 8px;
+
+            font-weight: bold;
+
+            transition: background-color 0.2s;
+        }
+
+        .button:hover {
+            background-color: #5d1592;
+        }
+
+        .button.secondary {
+            background-color: #e99fed;
+            color: #450d73;
+        }
+
+        .button.secondary:hover {
+            background-color: #d987dd;
+        }
+
+        .login-message {
+            margin-top: 35px;
+            padding: 15px;
+
+            background-color: #f3eafa;
+            border-radius: 8px;
+
+            color: #450d73;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+
+            color: #888;
+            font-size: 13px;
+        }
+
+    </style>
 </head>
+
 <body>
 
-  <h1>Primeira página</h1>
-  <p>Faça o login para acessar as páginas de Admin</p>
+<header>
+
+    <div class="logo">
+        Vet<span>Pet</span>
+    </div>
+
+    <div class="login-status">
+
+        <span sec:authorize="isAuthenticated()">
+            Usuário autenticado
+        </span>
+
+        <span sec:authorize="!isAuthenticated()">
+            Acesso não autenticado
+        </span>
+
+    </div>
+
+</header>
+
+
+<main class="container">
+
+    <div class="content">
+
+        <section class="welcome">
+
+            <h1>Bem-vindo ao VetPet 🐾</h1>
+
+            <p>
+                Sistema de gerenciamento veterinário
+                para facilitar o acompanhamento de pets,
+                tutores e consultas.
+            </p>
+
+        </section>
+
+
+        <section class="cards">
+
+            <!-- CONSULTA -->
+            <div class="card">
+
+                <div class="icon">
+                    🔎
+                </div>
+
+                <h2>Consultas</h2>
+
+                <p>
+                    Consulte informações sobre pets,
+                    tutores e veterinários cadastrados
+                    no sistema.
+                </p>
+
+                <a href="/consulta" class="button">
+                    Acessar consultas
+                </a>
+
+            </div>
+
+
+            <!-- OPERAÇÕES -->
+            <div class="card"
+                 sec:authorize="hasRole('ADMIN')">
+
+                <div class="icon">
+                    ⚙️
+                </div>
+
+                <h2>Operações</h2>
+
+                <p>
+                    Gerencie os dados do sistema,
+                    realizando cadastros, alterações
+                    e exclusões.
+                </p>
+
+                <a href="/operacoes" class="button secondary">
+                    Acessar operações
+                </a>
+
+            </div>
+
+
+            <!-- LOGIN -->
+            <div class="card"
+                 sec:authorize="!isAuthenticated()">
+
+                <div class="icon">
+                    🔐
+                </div>
+
+                <h2>Área administrativa</h2>
+
+                <p>
+                    Faça login para acessar as
+                    funcionalidades administrativas
+                    do sistema.
+                </p>
+
+                <a href="/login" class="button">
+                    Fazer login
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <div class="login-message"
+             sec:authorize="isAuthenticated()">
+
+            Você está conectado ao sistema.
+            Utilize as opções disponíveis acima.
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<footer>
+
+    VetPet © 2026 — Sistema de gerenciamento veterinário
+
+</footer>
 
 </body>
 </html>

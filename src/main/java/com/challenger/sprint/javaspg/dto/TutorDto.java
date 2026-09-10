@@ -21,6 +21,7 @@ public class TutorDto {
     private EnderecoDto endereco;
     private String email;
     private String telefone;
+    private String ultimoAcesso;
 
     public TutorDto(Long id, @NotBlank(message = "O nome do tutor é obrigatório") String nome, String fotoUrl, @NotBlank(message = "O CPF do tutor é obrigatório") String cpf, Endereco endereco, @NotBlank(message = "O email do tutor é obrigatório") String email, String telefone, List<Pet> pets, LocalDateTime ultimoAcesso) {
     }
