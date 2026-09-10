@@ -4,9 +4,11 @@ WORKDIR /app
 
 COPY . .
 
+RUN chmod +x mvnw
+
 RUN ./mvnw clean package -DskipTests
 
-# Etapa 2: imagem final
+
 FROM eclipse-temurin:21-jre
 
 RUN useradd -ms /bin/bash appuser
