@@ -1,5 +1,3 @@
-```dockerfile
-# Etapa 1: build da aplicação
 FROM eclipse-temurin:21-jdk AS build
 
 WORKDIR /app
@@ -24,4 +22,3 @@ USER appuser
 EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
-```
