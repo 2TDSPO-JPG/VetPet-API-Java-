@@ -25,21 +25,16 @@ public class Prontuario {
     @Column(name = "exame_id", nullable = false)
     private Long exameId;
 
-    // Usando @Lob para CLOB no Oracle (texto longo)
-    @Lob
-    @Column(name = "diagnostico", columnDefinition = "CLOB")
+    @Column(name = "diagnostico", columnDefinition = "VARCHAR(MAX)")
     private String diagnostico;
 
-    @Lob
-    @Column(name = "prescricao", columnDefinition = "CLOB")
+    @Column(name = "prescricao", columnDefinition = "VARCHAR(MAX)")
     private String prescricao;
 
-    @Lob
-    @Column(name = "exames_solicitados", columnDefinition = "CLOB")
+    @Column(name = "exames_solicitados", columnDefinition = "VARCHAR(MAX)")
     private String examesSolicitados;
 
-    @Lob
-    @Column(name = "observacoes", columnDefinition = "CLOB")
+    @Column(name = "observacoes", columnDefinition = "VARCHAR(MAX)")
     private String observacoes;
 
     @Column(name = "proximo_retorno", length = 255)
