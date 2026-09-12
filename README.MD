@@ -414,6 +414,12 @@ O passo a passo acima é adequado para ambientes de demonstração/estudo. Para 
 
  - Link do Vídeo : [Youtube](https://youtu.be/TKsj_6xIfmI)
 
+## Print
+
+![img_1.png](img_1.png)
+
+![img_2.png](img_2.png)
+
 ## Autor
 
 **Pedro Ferreira**
