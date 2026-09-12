@@ -1,611 +1,423 @@
-# JavaSPG - Sistema de Gestão Veterinária
+# 🐾 VetPet API
 
-## Sobre o Projeto
+API REST desenvolvida em **Java 21 + Spring Boot**, criada para dar suporte à gestão de uma clínica veterinária. A aplicação centraliza o cadastro de tutores e pets, a associação entre eles e o controle de exames veterinários, oferecendo endpoints REST documentados via Swagger/OpenAPI e autenticação via Spring Security.
 
-O JavaSPG é uma API REST desenvolvida em Java utilizando Spring Boot, focada no gerenciamento de tutores, pets e exames veterinários.
-
-O projeto foi construído utilizando boas práticas de desenvolvimento backend, arquitetura em camadas, DTOs, JPA/Hibernate e integração com Oracle Database.
+Este documento descreve a arquitetura do projeto, suas dependências e, principalmente, **o passo a passo completo para realizar o deploy da aplicação no Microsoft Azure** (App Service + Azure SQL Database).
 
 ---
 
-# Tecnologias Utilizadas
+## Sumário
 
-## Backend
-
-- Java 21
-- Spring Boot
-- Spring Web MVC
-- Spring Data JPA
-- Hibernate
-- Maven
-- Lombok
-- Oracle Database
-- Swagger/OpenAPI
-
-## Ferramentas
-
-- IntelliJ IDEA
-- Postman
-- Oracle SQL Developer
-- Git e GitHub
+- [O que a aplicação faz](#o-que-a-aplicação-faz)
+- [Arquitetura](#arquitetura)
+- [Stack e dependências](#stack-e-dependências)
+- [Executando localmente](#executando-localmente)
+- [Deploy no Azure — passo a passo](#deploy-no-azure--passo-a-passo)
+- [Variáveis de ambiente](#variáveis-de-ambiente)
+- [Verificando o deploy](#verificando-o-deploy)
+- [Encerrando os recursos na Azure](#encerrando-os-recursos-na-azure)
+- [Segurança e boas práticas para produção](#segurança-e-boas-práticas-para-produção)
 
 ---
 
-# Arquitetura do Projeto
+## O que a aplicação faz
 
-O sistema segue arquitetura em camadas:
+O **VetPet** é uma API para gestão veterinária que permite:
 
-```text
-Controller
-   ↓
-Service
-   ↓
-Repository
-   ↓
-Banco de Dados
-```
+- **Cadastro e autenticação de tutores**, incluindo busca por CPF/telefone e alteração de senha.
+- **Cadastro de pets** e afiliação de um pet a um tutor, com atualização de dados.
+- **Cadastro e consulta de exames veterinários**, com filtros por status, data, profissional responsável, código do pet e e-mail do tutor.
+- **Paginação** nas listagens de exames.
+- **Tratamento global de exceções** (`@ControllerAdvice`) para respostas de erro padronizadas.
+- **Documentação automática da API** via Swagger/OpenAPI.
+- Autenticação básica das requisições via **Spring Security**.
 
-# Estrutura de Pastas
-```
-  src/main/java/com/challenger/sprint/javaspg
-  │
-  ├── calcula
-  ├── controller
-  ├── dto
-  │   ├── function
-  │   ├── mapper
-  │   └── requeste
-  ├── entity
-  ├── enuns
-  ├── exception
-  │   ├── exceptions
-  │   └── handler
-  ├── repository
-  ├── service
-  └── JavaspgApplication.java
-```
-
-# Funcionalidades
-
-- Cadastro de tutores
--  Login de usuários
--  Cadastro de pets
--  Associação entre tutor e pet
--  Cadastro de exames
--  Busca de exames por:
-   - Status
-   - Data
-   - Profissional
-   - Código do pet
-   - Email do tutor
-- Paginação de resultados
-- Tratamento global de exceções
-- Documentação automática com Swagger
-
-# Configuração do Ambiente
-
- ### Requisitos
-- Java 21
-- Maven
-- Oracle Database
-- IDE Java
-
-
-# Configuração do application.properties
-
-``` 
-
-spring.application.name=javaspg
-
-spring.datasource.url=jdbc:oracle:thin:@oracle.fiap.com.br:1521:ORCL
-spring.datasource.username=${USER_DB_ORACLE:SEU_USUARIO}
-spring.datasource.password=${PASSWORD_DB_ORACLE:SUA_SENHA}
-
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.database-platform=org.hibernate.dialect.OracleDialect
+A aplicação segue uma arquitetura em camadas clássica:
 
 ```
-
-# Como Executar o Projeto
-
-## Clonar o repositório
-
-```
-bash git clone  
+Controller → Service → Repository → Banco de Dados
 ```
 
-## Entra na pasta do projeto
+com uso de DTOs e mappers para desacoplar as entidades JPA da camada de exposição HTTP.
+
+## Arquitetura
 
 ```
-cd javaspg
-```
-
-## Instalar dependências
-
-```
-mvn clean install
-```
-
-## Executar a aplicação
-
-```
-mvn spring-boot:run
-```
-
-## Swagger UI
-
-Acesse a documentação da API em: `http://localhost:8080/swagger-ui/index.html`
-
-# Entidade do sistema
-
-## Tutor
-Representa o responsável pelo pet
-
-### Principais atributos:
-- id: Identificador único do tutor
-- nome: Nome do tutor
-- cpf: CPF do tutor
-- email: Email do tutor
-- telefone: Telefone de contato do tutor
-- endereco: Endereço do tutor
-- credenciais: Senha do tutor para autenticação
-
----
-
-## Pet
-Representa o animal de estimação do tutor
-
-### Principais atributos:
-- id: Identificador único do pet
-- nome: Nome do pet
-- raça: Raça do pet
-- dataNascimento: Data de nascimento do pet
-- petCode: Código único do pet para identificação
-
----
-
-## Exame
-Representa um exame veterinário realizado no pet
-
-### Principais atributos:
-- id: Identificador único do exame
-- dataExame: Data em que o exame foi realizado
-- status: Status do exame (PENDENTE, CONCLUIDO, CANCELADO)
-- profissionalResponsavel: Nome do profissional responsável pelo exame
-- pet: Referência ao pet associado ao exame
-
----
-
-## Endpoints Principais
-
-# JavaSPG - Sistema de Gestão Veterinária
-
-## Sobre o Projeto
-
-O JavaSPG é uma API REST desenvolvida em Java utilizando Spring Boot, focada no gerenciamento de tutores, pets e exames veterinários.
-
-O projeto foi construído utilizando boas práticas de desenvolvimento backend, arquitetura em camadas, DTOs, JPA/Hibernate e integração com Oracle Database.
-
----
-
-# Tecnologias Utilizadas
-
-## Backend
-
-- Java 21
-- Spring Boot
-- Spring Web MVC
-- Spring Data JPA
-- Hibernate
-- Maven
-- Lombok
-- Oracle Database
-- Swagger/OpenAPI
-
-## Ferramentas
-
-- IntelliJ IDEA
-- Postman
-- Oracle SQL Developer
-- Git e GitHub
-
----
-
-# Arquitetura do Projeto
-
-O sistema segue arquitetura em camadas:
-
-```text
-Controller
-   ↓
-Service
-   ↓
-Repository
-   ↓
-Banco de Dados
-```
-
----
-
-# Estrutura de Pastas
-
-```text
 src/main/java/com/challenger/sprint/javaspg
 │
-├── calcula
-├── controller
-├── dto
-│   ├── function
-│   ├── mapper
-│   └── requeste
-├── entity
-├── enuns
-├── exception
-│   ├── exceptions
-│   └── handler
-├── repository
-├── service
+├── controller        # Endpoints REST (Tutor, Pet, Exames, Veterinario, Prontuario, Perguntas)
+├── service            # Regras de negócio
+├── repository         # Interfaces Spring Data JPA
+├── entity             # Entidades JPA mapeadas para o banco relacional
+├── dto                # Objetos de transferência (request/response) e mappers
+├── security           # Configuração do Spring Security
+├── config             # Configurações gerais (CORS, etc.)
+├── exception           # Exceções customizadas e handler global
+├── enuns              # Enumeradores do domínio (ex.: Status do exame)
 └── JavaspgApplication.java
 ```
 
----
+## Stack e dependências
 
-# Funcionalidades
+| Categoria           | Tecnologia                                             |
+|----------------------|---------------------------------------------------------|
+| Linguagem            | Java 21                                                 |
+| Framework            | Spring Boot (`spring-boot-starter-parent` 4.0.6)        |
+| Camada Web           | Spring Web MVC                                          |
+| Persistência         | Spring Data JPA / Hibernate                              |
+| Banco de dados        | Microsoft SQL Server (driver `mssql-jdbc` 12.8.1.jre11) — compatível com **Azure SQL Database** |
+| Segurança            | Spring Security                                         |
+| Validação            | Spring Boot Validation (Jakarta Bean Validation)        |
+| Templates            | Thymeleaf (páginas HTML auxiliares)                     |
+| Documentação de API   | SpringDoc OpenAPI (Swagger UI)                           |
+| Redução de boilerplate | Lombok                                                 |
+| Build                | Maven (via Maven Wrapper `mvnw` / `mvnw.cmd`)            |
+| Containerização       | Docker (multi-stage build) e Docker Compose             |
+| Testes                | Spring Boot Test, Spring Data JPA Test, Spring Web MVC Test |
 
-- Cadastro de tutores
-- Login de usuários
-- Cadastro de pets
-- Associação entre tutor e pet
-- Cadastro de exames
-- Busca de exames por:
-    - Status
-    - Data
-    - Profissional
-    - Código do pet
-    - Email do tutor
-- Paginação de resultados
-- Tratamento global de exceções
-- Documentação automática com Swagger
+Essas dependências estão declaradas no `pom.xml` e são resolvidas automaticamente pelo Maven durante o build.
 
----
+### Pré-requisitos para deploy
 
-# Configuração do Ambiente
-
-## Requisitos
-
-- Java 21
-- Maven
-- Oracle Database
-- IDE Java
+- Conta ativa no **Microsoft Azure** com permissão para criar recursos.
+- **Azure CLI** instalado e autenticado (`az login`).
+- **JDK 21** e **Maven** (ou apenas o Maven Wrapper incluso no projeto) instalados localmente.
+- **Git** (opcional, para clonar o repositório).
 
 ---
 
-# Configuração do application.properties
-
-```properties
-spring.application.name=javaspg
-
-spring.datasource.url=jdbc:oracle:thin:@oracle.fiap.com.br:1521:ORCL
-spring.datasource.username=${USER_DB_ORACLE:SEU_USUARIO}
-spring.datasource.password=${PASSWORD_DB_ORACLE:SUA_SENHA}
-
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.database-platform=org.hibernate.dialect.OracleDialect
-```
-
----
-
-# Como Executar o Projeto
-
-## Clonar repositório
+## Executando localmente
 
 ```bash
-git clone URL_DO_REPOSITORIO
+# Clonar o repositório
+git clone <URL_DO_REPOSITORIO>
+cd VetPet-API-Java-
+
+# Definir as variáveis de ambiente exigidas pelo application.properties
+export SPRING_DATASOURCE_URL="jdbc:sqlserver://<host>:1433;databaseName=<db>;encrypt=true;"
+export SPRING_DATASOURCE_USERNAME="<usuario>"
+export SPRING_DATASOURCE_PASSWORD="<senha>"
+export APP_ADMIN_USER="<usuario_admin>"
+export APP_ADMIN_PASSWORD="<senha_admin>"
+
+# Build e execução
+./mvnw clean package -DskipTests
+./mvnw spring-boot:run
 ```
 
-## Entrar na pasta
+A API sobe por padrão na porta `8080` e a documentação Swagger fica disponível em:
 
-```bash
-cd javaspg
 ```
-
-## Instalar dependências
-
-```bash
-mvn clean install
-```
-
-## Executar aplicação
-
-```bash
-mvn spring-boot:run
-```
-
----
-
-# Swagger
-
-Após iniciar a aplicação:
-
-```text
 http://localhost:8080/swagger-ui/index.html
 ```
 
----
+Também é possível subir a aplicação via Docker:
 
-# Entidades do Sistema
-
-## Tutor
-
-Representa o responsável pelo pet.
-
-### Principais atributos
-
-- id
-- nome
-- cpf
-- telefone
-- email
-- endereço
-- credenciais
-
----
-
-## Pet
-
-Representa o animal cadastrado no sistema.
-
-### Principais atributos
-
-- id
-- nome
-- raça
-- dataNascimento
-- petCode
-
----
-
-## Exames
-
-Representa exames veterinários realizados.
-
-### Principais atributos
-
-- id
-- dataExame
-- status
-- nomeDoProfissional
-- pet
-
----
-
-# Endpoints Principais
-
-## TutorController
-
-### Cadastro de tutor
-
-```http
-POST /tutores
-```
-
-### Login
-
-```http
-POST /tutores/login
-```
-
-### Buscar tutor por CPF
-
-```http
-GET /tutores/buscar-por-cpf?cpf=
-```
-
-### Buscar tutor por telefone
-
-```http
-GET /tutores/buscar-por-telefone?telefone=
-```
-
-### Alterar senha
-
-```http
-PUT /tutores/alterar-senha/{email}-{novaSenha}
+```bash
+docker build -t vetpet-api .
+docker run -p 8080:8080 \
+  -e SPRING_DATASOURCE_URL="jdbc:sqlserver://<host>:1433;databaseName=<db>;encrypt=true;" \
+  -e SPRING_DATASOURCE_USERNAME="<usuario>" \
+  -e SPRING_DATASOURCE_PASSWORD="<senha>" \
+  -e APP_ADMIN_USER="<usuario_admin>" \
+  -e APP_ADMIN_PASSWORD="<senha_admin>" \
+  vetpet-api
 ```
 
 ---
 
-## PetController
+## Deploy no Azure — passo a passo
 
-### Criar pet
+A estratégia de deploy utiliza:
 
-```http
-POST /pets/cadastrar/pet
+- **Azure App Service (Linux, runtime Java 21)** para hospedar o `.jar` da aplicação.
+- **Azure SQL Database** como banco de dados relacional (compatível com o driver `mssql-jdbc` já presente no `pom.xml`).
+- **Azure CLI** para provisionar toda a infraestrutura via linha de comando.
+
+> Substitua os nomes de recursos (`rg-javaspg-vetpet`, `sqlserver-vetpet-rm565824`, `webapp-vetpet-rm565824`) pelos identificadores desejados no seu ambiente. Nomes de servidor SQL e de Web App precisam ser **globalmente únicos** na Azure.
+
+### 1. Autenticar na Azure
+
+```bash
+az login
 ```
 
-### Buscar pet por código
+### 2. Criar o Resource Group
 
-```http
-GET /pets/buscar/pet-code-?petCode=
+Agrupa todos os recursos do projeto para facilitar gestão e remoção posterior.
+
+```bash
+az group create -n rg-javaspg-vetpet -l brazilsouth
 ```
 
-### Afiliar pet ao tutor
+### 3. Criar o servidor Azure SQL
 
-```http
-POST /pets/afiliar-pet
+```bash
+az sql server create \
+  -n sqlserver-vetpet-rm565824 \
+  -g rg-javaspg-vetpet \
+  --admin-user fiapadmin \
+  --admin-password "<SENHA_FORTE_AQUI>"
 ```
 
-### Atualizar pet
+> ⚠️ Use uma senha forte e única. Não reutilize a mesma senha em múltiplos ambientes.
 
-```http
-PUT /pets/atualizar-pet
+### 4. Criar o banco de dados
+
+```bash
+az sql db create \
+  -g rg-javaspg-vetpet \
+  --server sqlserver-vetpet-rm565824 \
+  -n bd_vetpet \
+  --service-objective Basic
+```
+
+O tier `Basic` é suficiente para ambientes de teste/demonstração. Para produção, avalie tiers como `Standard` ou `GeneralPurpose`.
+
+### 5. Liberar acesso de serviços Azure ao banco
+
+Libera o firewall do Azure SQL para que o App Service consiga se conectar.
+
+```bash
+az sql server firewall-rule create \
+  -g rg-javaspg-vetpet \
+  --server sqlserver-vetpet-rm565824 \
+  -n AllowAzureServices \
+  --start-ip-address 0.0.0.0 \
+  --end-ip-address 0.0.0.0
+```
+
+> A faixa `0.0.0.0-0.0.0.0` é a regra especial reconhecida pela Azure para liberar recursos internos do Azure. Evite liberar a faixa completa `0.0.0.0-255.255.255.255`, pois isso abre o banco para qualquer IP da internet.
+
+### 6. Criar o App Service Plan
+
+```bash
+az appservice plan create \
+  -n plan-javaspg-vetpet \
+  -g rg-javaspg-vetpet \
+  --is-linux \
+  --sku F1
+```
+
+O SKU `F1` (Free) é adequado para demonstrações. Para cargas reais, utilize no mínimo `B1` (Basic) ou superior.
+
+### 7. Criar o Web App com runtime Java 21
+
+```bash
+az webapp create \
+  -g rg-javaspg-vetpet \
+  --plan plan-javaspg-vetpet \
+  -n webapp-vetpet-rm565824 \
+  --runtime "JAVA:21-java21"
+```
+
+### 8. Configurar a conexão com o Azure SQL
+
+```bash
+az webapp config appsettings set \
+  -g rg-javaspg-vetpet \
+  -n webapp-vetpet-rm565824 \
+  --settings \
+    "SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver-vetpet-rm565824.database.windows.net:1433;databaseName=bd_vetpet;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;" \
+    "SPRING_DATASOURCE_USERNAME=fiapadmin" \
+    "SPRING_DATASOURCE_PASSWORD=<SENHA_FORTE_AQUI>"
+```
+
+### 9. Configurar o usuário do Spring Security
+
+Essas variáveis alimentam `spring.security.user.name` e `spring.security.user.password` no `application.properties`.
+
+```bash
+az webapp config appsettings set \
+  -g rg-javaspg-vetpet \
+  -n webapp-vetpet-rm565824 \
+  --settings \
+    "APP_ADMIN_USER=adminVetClyo" \
+    "APP_ADMIN_PASSWORD=adminVetPet123456"
+```
+
+Obs: peço que utilize exatamente essas credenciais para que outros professores utilizem, por favor. 
+
+### 10. Configurar o comando de inicialização (startup)
+
+Define como o App Service deve iniciar o `.jar` do Spring Boot.
+
+```bash
+az webapp config set \
+  -g rg-javaspg-vetpet \
+  -n webapp-vetpet-rm565824 \
+  --startup-file "java -jar /home/site/wwwroot/app.jar --server.port=80"
+```
+
+### 11. Habilitar logs da aplicação
+
+```bash
+az webapp log config \
+  -g rg-javaspg-vetpet \
+  -n webapp-vetpet-rm565824 \
+  --application-logging filesystem \
+  --level information
+```
+
+### 12. Conferir as variáveis de ambiente configuradas
+
+```bash
+az webapp config appsettings list \
+  -g rg-javaspg-vetpet \
+  -n webapp-vetpet-rm565824 \
+  --query "[].name" -o table
+```
+
+### 13. Compilar o projeto
+
+**Windows (PowerShell):**
+
+```powershell
+.\mvnw.cmd clean package -DskipTests
+```
+
+**Linux/macOS:**
+
+```bash
+./mvnw clean package -DskipTests
+```
+
+### 14. Conferir se o `.jar` foi gerado
+
+**Windows (PowerShell):**
+
+```powershell
+Get-ChildItem .\target\*.jar
+```
+
+**Linux/macOS:**
+
+```bash
+ls target/*.jar
+```
+
+### 15. Fazer o deploy do artefato
+
+**Windows (PowerShell):**
+
+```powershell
+az webapp deploy `
+  -g rg-javaspg-vetpet `
+  -n webapp-vetpet-rm565824 `
+  --src-path .\target\javaspg-0.0.1-SNAPSHOT.jar `
+  --type jar
+```
+
+**Linux/macOS:**
+
+```bash
+az webapp deploy \
+  -g rg-javaspg-vetpet \
+  -n webapp-vetpet-rm565824 \
+  --src-path ./target/javaspg-0.0.1-SNAPSHOT.jar \
+  --type jar
 ```
 
 ---
 
-## ExamesController
+## Verificando o deploy
 
-### Criar exame
+### Status da aplicação
 
-```http
-POST /exames/cadastrar
+```bash
+az webapp show \
+  -g rg-javaspg-vetpet \
+  -n webapp-vetpet-rm565824 \
+  --query "{state:state,enabled:enabled,host:defaultHostName}" -o table
 ```
 
-### Buscar exames por data
+### Acompanhar logs em tempo real
 
-```http
-GET /exames/data-exame?dataExame=
+```bash
+az webapp log tail -g rg-javaspg-vetpet -n webapp-vetpet-rm565824
 ```
 
-### Buscar exames por status
+### Obter a URL pública da aplicação
 
-```http
-GET /exames/status?status=
+```bash
+az webapp show \
+  -g rg-javaspg-vetpet \
+  -n webapp-vetpet-rm565824 \
+  --query defaultHostName -o tsv
 ```
 
-### Buscar exames por profissional
+Com a URL retornada, a documentação da API estará disponível em:
 
-```http
-GET /exames/profissional?nomeDoProfissional=
 ```
+https://<url-retornada>/swagger-ui/index.html
+```
+
+O acesso aos endpoints protegidos deverá usar as credenciais configuradas em `APP_ADMIN_USER` / `APP_ADMIN_PASSWORD` (autenticação básica do Spring Security).
 
 ---
 
-# Paginação
+## Variáveis de ambiente
 
-## Exemplo
+A aplicação lê as seguintes variáveis via `application.properties`:
 
-```http
-GET /exames/pet-code?petCode=ABC123&page=0&size=5
-```
+| Variável                     | Descrição                                                            |
+|-------------------------------|------------------------------------------------------------------------|
+| `SPRING_DATASOURCE_URL`       | URL JDBC de conexão com o Azure SQL Database                          |
+| `SPRING_DATASOURCE_USERNAME`  | Usuário administrador do servidor SQL                                  |
+| `SPRING_DATASOURCE_PASSWORD`  | Senha do usuário administrador do servidor SQL                         |
+| `APP_ADMIN_USER`              | Usuário utilizado na autenticação básica do Spring Security            |
+| `APP_ADMIN_PASSWORD`          | Senha utilizada na autenticação básica do Spring Security              |
 
----
-
-# Exemplo de Requisições
-
-## Cadastro de Tutor
-
-```json
-{
-  "nome": "Pedro Ferreira",
-  "cpf": "12345678900",
-  "telefone": "11999999999",
-  "email": "pedro@email.com",
-  "senha": "123456",
-  "endereco": {
-    "logradouro": "Rua Teste",
-    "numero": "100",
-    "bairro": "Centro",
-    "cidade": "São Paulo",
-    "estado": "SP"
-  }
-}
-```
+Nenhuma credencial deve ser versionada em texto puro no repositório — utilize sempre os *App Settings* do Azure App Service (ou um cofre de segredos, como o **Azure Key Vault**) para armazená-las.
 
 ---
 
-## Cadastro de Pet
+## Encerrando os recursos na Azure
 
-```json
-{
-  "name": "Negão",
-  "dataNascimento": "2026-01-18",
-  "raca": "Labrador"
-}
+Para evitar custos após testes/apresentações, remova todo o Resource Group (isso apaga o App Service, o App Service Plan e o Azure SQL Server/Database associados):
+
+```bash
+az group delete --name rg-javaspg-vetpet --yes
 ```
 
----
+Para confirmar que os recursos foram removidos:
 
-## Cadastro de Exame
+```bash
+az group exists --name rg-javaspg-vetpet
+```
 
-```json
-{
-  "nomeDoProfissional": "Dr. Carlos",
-  "status": "PENDENTE",
-  "dataExame": "2026-05-14T10:00:00",
-  "petCode": "ABC123"
-}
+Resultado esperado:
+
+```
+false
 ```
 
 ---
 
-# Tratamento de Exceções
+## Segurança e boas práticas para produção
 
-O projeto possui tratamento global de exceções utilizando:
+O passo a passo acima é adequado para ambientes de demonstração/estudo. Para um ambiente produtivo, considere:
 
-```java
-@ControllerAdvice
-```
-
-## Exceções personalizadas
-
-- CadastroException
-- DadoExistenteException
-- EntidadeNaoPersistidaException
-- LoginException
-- SenhaException
+- Armazenar segredos (senhas, connection strings) no **Azure Key Vault** em vez de *App Settings* em texto puro.
+- Restringir a regra de firewall do Azure SQL a IPs específicos, em vez de liberar todos os serviços Azure.
+- Utilizar um SKU pago (`B1` ou superior) no App Service Plan, já que o tier `F1` possui limitações de CPU, memória e não garante SLA.
+- Ativar HTTPS obrigatório (`az webapp update --https-only true`).
+- Substituir a autenticação básica por um mecanismo mais robusto, como **JWT**, conforme já indicado nas melhorias futuras do projeto.
+- Configurar um pipeline de **CI/CD** (Azure DevOps ou GitHub Actions) para automatizar build e deploy a cada alteração no repositório.
+- Habilitar backups automáticos do Azure SQL Database.
 
 ---
 
-# Diferenciais Técnicos
+## Links 
 
-- Arquitetura em camadas
-- Uso de DTOs
-- Paginação
-- Tratamento global de erros
-- Integração com Oracle
-- Documentação Swagger
-- Organização profissional de pacotes
-- Separação de responsabilidades
-- Uso de boas práticas REST
+ - Link do repositório: [Vet Pet](https://github.com/2TDSPO-JPG/VetPet-API-Java-.git)
 
----
+ - Link do Vídeo : [Youtube](https://youtu.be/TKsj_6xIfmI)
 
-# Melhorias Futuras
+## Autor
 
-## Técnicas
+**Pedro Ferreira**
 
-- Spring Security
-- JWT Authentication
-- Docker
-- Testes unitários
-- Testes de integração
-- CI/CD
-- Deploy em Cloud
-- Logs estruturados
-
-## Funcionais
-
-- Agenda veterinária
-- Histórico clínico
-- Vacinação
-- Dashboard administrativo
-- Upload de exames em PDF
-- Notificações por email
-
----
-
-# Autor
-
-## Pedro Ferreira
-
-Desenvolvedor Backend Java especializado em:
-
-- Java
-- Spring Boot
-- APIs REST
-- Oracle Database
-- Hibernate/JPA
-- Arquitetura Backend
-
----
-
-# Licença
+## Licença
 
 Projeto desenvolvido para fins acadêmicos e educacionais.
-
-# Print do SpringInitializer
-
-![img.png](img.png)
