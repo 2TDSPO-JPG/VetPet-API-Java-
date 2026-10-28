@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ExamesRepository extends JpaRepository<Exames, Long> {
+    boolean existsByVeterinarioIdAndDataExameAndStatusNot(Long id, LocalDateTime date, Status status);
     Page<Exames> findExamesByPetCode(String petCode, Pageable pageable);
     Page<Exames> findByDataExameBetween(LocalDateTime inicio, LocalDateTime fim, Pageable pageable);
     Page<Exames> findExamesByStatus(Status status, Pageable pageable);

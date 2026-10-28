@@ -19,6 +19,7 @@ public class ProntuarioController {
         this.prontuarioService = prontuarioService;
     }
 
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('VET','ADMIN')")
     @PostMapping
     public ResponseEntity<ProntuarioDto> criarProntuario(@RequestBody ProntuarioDto dto) {
         ProntuarioDto prontuario = prontuarioService.criarProntuario(dto);
@@ -37,12 +38,14 @@ public class ProntuarioController {
         return ResponseEntity.ok(prontuarios);
     }
 
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('VET','ADMIN')")
     @GetMapping("/veterinario/{veterinarioId}")
     public ResponseEntity<List<ProntuarioDto>> buscarProntuariosPorVeterinario(@PathVariable Long veterinarioId) {
         List<ProntuarioDto> prontuarios = prontuarioService.buscarProntuariosPorVeterinario(veterinarioId);
         return ResponseEntity.ok(prontuarios);
     }
 
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('VET','ADMIN')")
     @GetMapping("/veterinario/{veterinarioId}/paginado")
     public ResponseEntity<Page<ProntuarioDto>> buscarProntuariosPorVeterinarioPaginado(
             @PathVariable Long veterinarioId,
@@ -63,6 +66,7 @@ public class ProntuarioController {
         return ResponseEntity.ok(prontuarios);
     }
 
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('VET','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ProntuarioDto> atualizarProntuario(
             @PathVariable Long id,

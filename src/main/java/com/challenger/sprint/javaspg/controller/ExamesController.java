@@ -50,6 +50,7 @@ public class ExamesController {
         return ResponseEntity.ok(exames);
     }
 
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('VET','ADMIN')")
     @GetMapping("/data-exame")
     public Page<ExamesDto> buscarExamesPorDataExame(
             @RequestParam
@@ -83,6 +84,7 @@ public class ExamesController {
         );
     }
 
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('VET','ADMIN')")
     @GetMapping("/status")
     public Page<ExamesDto> buscarExamesPorStatus(
             @RequestParam Status status,
@@ -91,6 +93,7 @@ public class ExamesController {
         return examesService.buscarExamesPorStatus(status, pageable);
     }
 
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('VET','ADMIN')")
     @GetMapping("/profissional")
     public Page<ExamesDto> buscarExamesPorNomeDoProfissional(
             @RequestParam String nomeDoProfissional,
@@ -117,6 +120,7 @@ public class ExamesController {
         return ResponseEntity.ok(exameCancelado);
     }
 
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('VET','ADMIN')")
     @GetMapping("/veterinario/{veterinarioId}")
     public ResponseEntity<List<ExamesDto>> buscarExamesPorVeterinario(@PathVariable Long veterinarioId) {
         List<ExamesDto> exames = examesService.buscarExamesPorVeterinario(veterinarioId);
@@ -129,6 +133,7 @@ public class ExamesController {
         return ResponseEntity.ok(exames);
     }
 
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('VET','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ExamesDto> atualizarStatusExame(
             @PathVariable Long id,

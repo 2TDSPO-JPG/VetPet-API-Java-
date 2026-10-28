@@ -26,22 +26,27 @@ public class ExamesService {
     private final ExamesRepository examesRepository;
     private final PetRepository petRepository;
     private final VeterinarioRepository veterinarioRepository;
+    private final com.challenger.sprint.javaspg.security.MobileAccess access;
 
     public ExamesService(ExamesRepository examesRepository,
                          PetRepository petRepository,
-                         VeterinarioRepository veterinarioRepository) {
+                         VeterinarioRepository veterinarioRepository, com.challenger.sprint.javaspg.security.MobileAccess access) {
+        this.access=access;
         this.examesRepository = examesRepository;
         this.petRepository = petRepository;
         this.veterinarioRepository = veterinarioRepository;
     }
 
-    public ExamesDto criarExames(ExamesDto dto) {
+    public synchronized ExamesDto criarExames(ExamesDto dto) {
 
         if (dto == null) {
             throw new CadastroException(
                     "Dados do exame não podem ser nulos"
             );
         }
+        if (dto.getPetId() == null || dto.getVeterinarioId() == null || dto.getDataExame() == null || !dto.getDataExame().isAfter(LocalDateTime.now())) throw new CadastroException("Informe pet, veterinário e data futura.");
+        access.pet(dto.getPetId()); access.tutorEmail(dto.getEmailTutores());
+        if (examesRepository.existsByVeterinarioIdAndDataExameAndStatusNot(dto.getVeterinarioId(), dto.getDataExame(), Status.CANCELADO)) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.CONFLICT, "Este horário já está ocupado.");
         dto.setStatus(Status.AGENDADO);
 
         // Buscar Pet
@@ -74,6 +79,7 @@ public class ExamesService {
     }
 
     public List<ExamesDto> buscarExamesPorPetCodeList(String petCode) {
+        authorizePetCode(petCode);
         List<Exames> exames = examesRepository.findExamesByPetCode(petCode);
 
         if (exames.isEmpty()) {
@@ -88,6 +94,7 @@ public class ExamesService {
     }
 
     public ExamesDto atualizarStatusExame(Long id, String status) {
+        access.exam(id);
         Exames exame = examesRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoPersistidaException("Exame não encontrado com ID: " + id));
 
@@ -105,6 +112,7 @@ public class ExamesService {
             String petCode,
             Pageable pageable
     ) {
+        authorizePetCode(petCode);
 
         Page<Exames> exames =
                 examesRepository.findExamesByPetCode(
@@ -140,6 +148,7 @@ public class ExamesService {
     }
 
     public ExamesDto buscarExameMaisProximo(String petCode) {
+        authorizePetCode(petCode);
 
         LocalDateTime agora = LocalDateTime.now();
 
@@ -160,7 +169,7 @@ public class ExamesService {
             String emailTutores,
             Pageable pageable
     ) {
-
+        access.tutorEmail(emailTutores);
         Page<Exames> exames =
                 examesRepository.findExamesByEmailTutores(
                         emailTutores,
@@ -227,11 +236,14 @@ public class ExamesService {
         );
 
         return exames.stream()
-                .map(ExamesMapper::toDto)
+                .map(exame -> access.staff() ? ExamesMapper.toDto(exame) : ExamesDto.builder()
+                        .id(exame.getId()).dataExame(exame.getDataExame()).status(exame.getStatus())
+                        .veterinarioId(veterinarioId).build())
                 .collect(Collectors.toList());
     }
 
     public ExamesDto cancelarExame(Long id) {
+        access.exam(id);
         Exames exame = examesRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoPersistidaException("Exame não encontrado"));
 
@@ -246,6 +258,12 @@ public class ExamesService {
         return exames.stream()
                 .map(ExamesMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    private void authorizePetCode(String code) {
+        Pet pet = petRepository.findPetByPetCode(code);
+        if (pet == null) throw new EntidadeNaoPersistidaException("Pet não encontrado");
+        access.pet(pet.getId());
     }
 
     public List<ExamesDto> buscarTodosExames() {

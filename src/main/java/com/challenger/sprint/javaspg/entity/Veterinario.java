@@ -29,7 +29,7 @@ public class Veterinario {
     @Column
     private String telefone;
 
-    @Column(columnDefinition = "CLOB")
+    @Lob
     private String biografia;
 
     @Column
@@ -41,7 +41,7 @@ public class Veterinario {
     @Column
     private boolean primeiroLogin = true;
 
-    @Column(columnDefinition = "CLOB")
+    @Lob
     private String fotoUrl;
 
     @Column(unique = true)

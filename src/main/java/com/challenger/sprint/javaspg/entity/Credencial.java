@@ -22,6 +22,7 @@ public class Credencial {
 
     @Column
     @NotBlank(message = "A senha é obrigatória")
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
     private String senha;
 
     @OneToOne

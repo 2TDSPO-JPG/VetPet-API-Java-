@@ -13,25 +13,30 @@ import java.util.List;
 public class PerguntasController {
 
     private final PerguntasService perguntasService;
+    private final com.challenger.sprint.javaspg.security.MobileAccess access;
 
-    public PerguntasController(PerguntasService perguntasService) {
+    public PerguntasController(PerguntasService perguntasService, com.challenger.sprint.javaspg.security.MobileAccess access) {
+        this.access=access;
         this.perguntasService = perguntasService;
     }
 
     @PostMapping
     public ResponseEntity<Perguntas> criarPergunta(@RequestBody Perguntas pergunta) {
+        access.pet(pergunta.getIdPet());
         Perguntas novaPergunta = perguntasService.salvar(pergunta);
         return ResponseEntity.status(HttpStatus.CREATED).body(novaPergunta);
     }
 
     @GetMapping("/pet/{idPet}")
     public ResponseEntity<List<Perguntas>> buscarPerguntasPorPet(@PathVariable Long idPet) {
+        access.pet(idPet);
         List<Perguntas> perguntas = perguntasService.buscarPorPet(idPet);
         return ResponseEntity.ok(perguntas);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Perguntas> atualizar(@PathVariable Long id, @RequestBody Perguntas dados){
+        access.pet(dados.getIdPet());
         Perguntas atualizada = perguntasService.atualizar(id, dados);
         return ResponseEntity.ok(atualizada);
     }

@@ -14,8 +14,10 @@ import java.util.List;
 public class VeterinarioController {
 
     private final VeterinarioService veterinarioService;
+    private final com.challenger.sprint.javaspg.security.MobileSessions sessions;
 
-    public VeterinarioController(VeterinarioService veterinarioService) {
+    public VeterinarioController(VeterinarioService veterinarioService, com.challenger.sprint.javaspg.security.MobileSessions sessions) {
+        this.sessions = sessions;
         this.veterinarioService = veterinarioService;
     }
 
@@ -49,6 +51,7 @@ public class VeterinarioController {
         return ResponseEntity.ok(veterinario);
     }
 
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN') or (hasRole('VET') and principal.id() == #id)")
     @PutMapping("/{id}")
     public ResponseEntity<Veterinario> atualizar(@PathVariable Long id, @RequestBody Veterinario veterinario) {
         veterinario.setId(id);
@@ -56,6 +59,7 @@ public class VeterinarioController {
         return ResponseEntity.ok(atualizado);
     }
 
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletar(@PathVariable Long id) {
         veterinarioService.deletar(id);
@@ -63,9 +67,9 @@ public class VeterinarioController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Veterinario> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<java.util.Map<String,Object>> login(@RequestBody LoginDto loginDto) {
         Veterinario veterinario = veterinarioService.login(loginDto.getEmail(), loginDto.getSenha());
-        return ResponseEntity.ok(veterinario);
+        return ResponseEntity.ok(java.util.Map.of("token", sessions.issue(veterinario.getId(), veterinario.getEmail(), "VET"), "veterinario", veterinario));
     }
 
 }

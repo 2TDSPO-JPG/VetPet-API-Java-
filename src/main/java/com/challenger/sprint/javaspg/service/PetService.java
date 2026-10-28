@@ -21,8 +21,10 @@ public class PetService {
 
     private final PetRepository petRepository;
     private final TutorRepository tutorRepository;
+    private final com.challenger.sprint.javaspg.security.MobileAccess access;
 
-    public PetService(PetRepository petRepository, TutorRepository tutorRepository) {
+    public PetService(PetRepository petRepository, TutorRepository tutorRepository, com.challenger.sprint.javaspg.security.MobileAccess access) {
+        this.access = access;
         this.petRepository = petRepository;
         this.tutorRepository = tutorRepository;
     }
@@ -35,7 +37,9 @@ public class PetService {
         return PetMapper.toDto(pet);
     }
 
+    @Transactional
     public PetDto criarPet(PetRequestDto dto){
+        dto.tutores().forEach(access::tutor);
 
         List<Tutor> tutores = tutorRepository.findAllById(dto.tutores());
 
@@ -65,6 +69,7 @@ public class PetService {
     }
 
     public String afiliarPet(AfiliarPet dto){
+        access.tutor(dto.tutorIds());
 
         Pet pet = petRepository.findPetByPetCode(dto.petCode());
         if(pet == null){
@@ -85,6 +90,7 @@ public class PetService {
     }
 
     public PetDto atualizarPet(PetRequestUploadDto pet){
+        access.pet(pet.id());
         Optional<Pet> pet1 = petRepository.findById(pet.id());
         if (pet1.isEmpty()) throw new EntidadeNaoPersistidaException("Não foi possível encontrar o Pet informado!");
         Pet petExistente = pet1.get();
@@ -100,6 +106,7 @@ public class PetService {
 
     @Transactional
     public String deletarPet(Long id) {
+        access.pet(id);
 
         Pet pet = petRepository.findById(id)
                 .orElseThrow(() ->
@@ -135,6 +142,8 @@ public class PetService {
             );
         }
 
+        access.pet(pet.getId());
+
         pet.getTutores().forEach(
                 tutor -> tutor.getPets().remove(pet)
         );
@@ -150,4 +159,10 @@ public class PetService {
     public List<Pet> listarPets() {
         return petRepository.findAll();
     }
+
+    @Transactional(readOnly = true)
+    public List<PetDto> porTutorEmail(String email) { access.tutorEmail(email); return PetMapper.toDtoList(petRepository.findDistinctByTutores_EmailIgnoreCase(email)); }
+    @Transactional(readOnly = true)
+    public List<PetDto> porTutorId(Long id) { access.tutor(id); return PetMapper.toDtoList(petRepository.findDistinctByTutores_Id(id)); }
+
 }

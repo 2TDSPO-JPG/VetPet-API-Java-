@@ -11,8 +11,10 @@ import java.util.List;
 public class PerguntasService {
 
     private final PerguntasRepository perguntasRepository;
+    private final com.challenger.sprint.javaspg.security.MobileAccess access;
 
-    public PerguntasService(PerguntasRepository perguntasRepository) {
+    public PerguntasService(PerguntasRepository perguntasRepository, com.challenger.sprint.javaspg.security.MobileAccess access) {
+        this.access=access;
         this.perguntasRepository = perguntasRepository;
     }
 
@@ -25,6 +27,7 @@ public class PerguntasService {
     }
 
     public Perguntas atualizar(Long id, Perguntas dados) {
+        access.question(id);
         Perguntas pergunta = perguntasRepository.findById(id).orElseThrow(() ->
                         new RuntimeException("Pergunta não encontrada"));
 
@@ -35,6 +38,7 @@ public class PerguntasService {
     }
 
     public void deletarPergunta(Long id) {
+        access.question(id);
         if (!perguntasRepository.existsById(id)) {
             throw new EntidadeNaoPersistidaException("Pergunta não encontrada");
         }

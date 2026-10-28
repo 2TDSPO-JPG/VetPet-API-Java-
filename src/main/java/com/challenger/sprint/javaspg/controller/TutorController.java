@@ -16,8 +16,10 @@ import java.util.List;
 public class TutorController {
 
     private TutorService tutorService;
+    private final com.challenger.sprint.javaspg.security.MobileSessions sessions;
 
-    public TutorController(TutorService tutorService) {
+    public TutorController(TutorService tutorService, com.challenger.sprint.javaspg.security.MobileSessions sessions) {
+        this.sessions = sessions;
         this.tutorService = tutorService;
     }
 
@@ -28,9 +30,9 @@ public class TutorController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TutorDto> login(@RequestBody LoginDto loginDto){
+    public ResponseEntity<java.util.Map<String,Object>> login(@RequestBody LoginDto loginDto){
         TutorDto tutor = tutorService.login(loginDto.getEmail(), loginDto.getSenha());
-        return ResponseEntity.status(HttpStatus.CREATED).body(tutor);
+        return ResponseEntity.ok(java.util.Map.of("token", sessions.issue(tutor.getId(), tutor.getEmail(), "TUTOR"), "usuario", tutor));
     }
 
     @GetMapping("/buscar-por-cpf")

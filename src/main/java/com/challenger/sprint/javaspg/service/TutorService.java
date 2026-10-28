@@ -26,20 +26,17 @@ public class TutorService {
 
     private final TutorRepository tutorRepository;
     private final PetRepository petRepository;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwords;
+    private final com.challenger.sprint.javaspg.security.MobileAccess access;
 
     public TutorDto login(String email, String senha){
-
-        Optional<Tutor> tutor = tutorRepository.findTutorByEmailAndCredencial_Senha(email, senha);
-        var tutorEncontrado = tutor.get();
-        if (tutor.isEmpty()) {
-            if (tutorRepository.findByEmail(tutorEncontrado.getEmail()).isPresent() || tutorRepository.findByEmail(tutorEncontrado.getCredencial().getSenha()).isPresent()) throw new LoginException("Login incorreto, verifiquei os dados informados");
-        }
-
-        var tutor1 = tutor.get();
-        tutor1.setUltimoAcesso(LocalDateTime.now());
-        tutorRepository.save(tutor1);
-
-        return TutorMapper.toDtoOpn(tutor);
+        Tutor found = tutorRepository.findByEmail(email.trim().toLowerCase(java.util.Locale.ROOT)).orElseThrow(() -> new LoginException("Credenciais inválidas"));
+        String stored = found.getCredencial().getSenha();
+        boolean encoded = stored.startsWith("$2");
+        if (!(encoded ? passwords.matches(senha, stored) : java.security.MessageDigest.isEqual(stored.getBytes(java.nio.charset.StandardCharsets.UTF_8), senha.getBytes(java.nio.charset.StandardCharsets.UTF_8)))) throw new LoginException("Credenciais inválidas");
+        if (!encoded) found.getCredencial().setSenha(passwords.encode(senha));
+        found.setUltimoAcesso(LocalDateTime.now()); tutorRepository.save(found);
+        return TutorMapper.toDto(found);
     }
 
     @Transactional
@@ -47,7 +44,7 @@ public class TutorService {
         if (tutorRepository.findByEmail(tutor.getEmail()).isPresent()) throw new DadoExistenteException("O email já está em uso.");
         if (tutorRepository.findByCpf(tutor.getCpf()).isPresent())throw new DadoExistenteException("O cpf informado ja esta sendo utilizado por outro usuario");
         var credencial = Credencial.builder()
-                .senha(tutor.getCredencial().getSenha())
+                .senha(passwords.encode(tutor.getCredencial().getSenha()))
                 .tutor(tutor)
                 .build();
         tutor.setCredencial(credencial);
@@ -59,32 +56,37 @@ public class TutorService {
     public TutorDto buscarTutorPorCpf(String cpf){
         Optional<Tutor> tutor = tutorRepository.findByCpf(cpf);
         if(tutor.isEmpty()) throw new EntidadeNaoPersistidaException("Tutor nao foi encontrado");
+        access.tutor(tutor.get().getId());
         return TutorMapper.toDtoOpn(tutor);
     }
 
     public TutorDto buscarTutorPorTelefone(String telefone){
         Optional<Tutor> tutor = tutorRepository.findByTelefone(telefone);
         if(tutor.isEmpty()) throw new EntidadeNaoPersistidaException("Tutor nao foi encontrado");
+        access.tutor(tutor.get().getId());
         return TutorMapper.toDtoOpn(tutor);
     }
 
     public String alterarSenha(String email, String novaSenha){
+        access.tutorEmail(email);
         Optional<Tutor> tutor = tutorRepository.findByEmail(email);
         if(tutor.isEmpty()) throw new EntidadeNaoPersistidaException("Tutor nao foi encontrado");
         var tutor1 = tutor.get();
         if (tutor1.getCredencial().getSenha().equals(novaSenha)) throw new SenhaException("A nova senha deve ser diferente da senha atual.");
-        tutor1.getCredencial().setSenha(novaSenha);
+        tutor1.getCredencial().setSenha(passwords.encode(novaSenha));
         tutorRepository.save(tutor1);
         return "Senha alterada com sucesso.";
     }
 
     public TutorDto buscarTutorPorId(Long id){
+        access.tutor(id);
         Optional<Tutor> tutor = tutorRepository.findTutorById(id);
         if(tutor.isEmpty()) throw new EntidadeNaoPersistidaException("Tutor nao foi encontrado");
         return TutorMapper.toDtoOpn(tutor);
     }
 
     public TutorDto buscarTutorPorEmail(String email) {
+        access.tutorEmail(email);
         Optional<Tutor> tutor = tutorRepository.findByEmail(email);
         if(tutor.isEmpty()) throw new EntidadeNaoPersistidaException("Tutor não encontrado");
         return TutorMapper.toDtoOpn(tutor);
@@ -96,6 +98,7 @@ public class TutorService {
     }
 
     public String deletarTutor(Long id){
+        access.tutor(id);
         Optional<Tutor> tutor = tutorRepository.findTutorById(id);
         if(tutor.isEmpty()) throw new EntidadeNaoPersistidaException("Tutor nao foi encontrado");
         tutorRepository.delete(tutor.get());
@@ -103,6 +106,7 @@ public class TutorService {
     }
 
     public TutorDto atualizarTutor(Tutor tutor) {
+        access.tutor(tutor.getId());
         Optional<Tutor> tutorExistente = tutorRepository.findById(tutor.getId());
         if (tutorExistente.isEmpty()) {
             throw new EntidadeNaoPersistidaException("Tutor não encontrado");
@@ -176,6 +180,7 @@ public class TutorService {
             }
         }
 
+        if (tutor.getCredencial() != null && tutor.getCredencial().getSenha() != null && !tutor.getCredencial().getSenha().isBlank()) tutorAtual.getCredencial().setSenha(passwords.encode(tutor.getCredencial().getSenha()));
         Tutor tutorSalvo = tutorRepository.save(tutorAtual);
         return TutorMapper.toDto(tutorSalvo);
     }

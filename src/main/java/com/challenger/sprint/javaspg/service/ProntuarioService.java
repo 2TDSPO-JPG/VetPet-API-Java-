@@ -25,10 +25,12 @@ public class ProntuarioService {
     private final ProntuarioRepository prontuarioRepository;
     private final ExamesRepository examesRepository;
     private final VeterinarioRepository veterinarioRepository;
+    private final com.challenger.sprint.javaspg.security.MobileAccess access;
 
     public ProntuarioService(ProntuarioRepository prontuarioRepository,
                              ExamesRepository examesRepository,
-                             VeterinarioRepository veterinarioRepository) {
+                             VeterinarioRepository veterinarioRepository, com.challenger.sprint.javaspg.security.MobileAccess access) {
+        this.access=access;
         this.prontuarioRepository = prontuarioRepository;
         this.examesRepository = examesRepository;
         this.veterinarioRepository = veterinarioRepository;
@@ -75,6 +77,7 @@ public class ProntuarioService {
     }
 
     public List<ProntuarioDto> buscarProntuariosPorExame(Long exameId) {
+        access.exam(exameId);
         List<Prontuario> prontuarios = prontuarioRepository.findByExameId(exameId);
         return prontuarios.stream()
                 .map(ProntuarioMapper::toDto)
@@ -82,6 +85,7 @@ public class ProntuarioService {
     }
 
     public List<ProntuarioDto> buscarProntuariosPorPet(Long petId) {
+        access.pet(petId);
         List<Prontuario> prontuarios = prontuarioRepository.findByPetIdOrderByDataAtendimentoDesc(petId);
         return prontuarios.stream()
                 .map(ProntuarioMapper::toDto)
@@ -103,10 +107,12 @@ public class ProntuarioService {
     public ProntuarioDto buscarProntuarioPorId(Long id) {
         Prontuario prontuario = prontuarioRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoPersistidaException("Prontuário não encontrado"));
+        access.pet(prontuario.getPetId());
         return ProntuarioMapper.toDto(prontuario);
     }
 
     public List<ProntuarioDto> buscarProntuariosPorTutorEmail(String email) {
+        access.tutorEmail(email);
         List<Prontuario> prontuarios = prontuarioRepository.findByTutorEmail(email);
         return prontuarios.stream()
                 .map(ProntuarioMapper::toDto)

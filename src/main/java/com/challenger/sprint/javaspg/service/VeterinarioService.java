@@ -18,8 +18,10 @@ import java.util.Optional;
 public class VeterinarioService {
 
     private final VeterinarioRepository veterinarioRepository;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwords;
 
-    public VeterinarioService(VeterinarioRepository veterinarioRepository) {
+    public VeterinarioService(VeterinarioRepository veterinarioRepository, org.springframework.security.crypto.password.PasswordEncoder passwords) {
+        this.passwords = passwords;
         this.veterinarioRepository = veterinarioRepository;
     }
 
@@ -30,7 +32,7 @@ public class VeterinarioService {
         }
 
         Veterinario vet = veterinario.get();
-        if (vet.getCredencial() == null || !vet.getCredencial().getSenha().equals(senha)) {
+        if (vet.getCredencial() == null || !(vet.getCredencial().getSenha().startsWith("$2") ? passwords.matches(senha, vet.getCredencial().getSenha()) : vet.getCredencial().getSenha().equals(senha))) {
             throw new LoginException("Senha incorreta");
         }
 
@@ -46,7 +48,7 @@ public class VeterinarioService {
         // Criar credencial
         if (veterinario.getCredencial() != null) {
             Credencial credencial = new Credencial();
-            credencial.setSenha(veterinario.getCredencial().getSenha());
+            credencial.setSenha(passwords.encode(veterinario.getCredencial().getSenha()));
             credencial.setVeterinario(veterinario);
             veterinario.setCredencial(credencial);
         }
@@ -115,10 +117,10 @@ public class VeterinarioService {
 
         if (veterinario.getCredencial() != null && veterinario.getCredencial().getSenha() != null) {
             if (vetAtual.getCredencial() != null) {
-                vetAtual.getCredencial().setSenha(veterinario.getCredencial().getSenha());
+                vetAtual.getCredencial().setSenha(passwords.encode(veterinario.getCredencial().getSenha()));
             } else {
                 Credencial novaCredencial = new Credencial();
-                novaCredencial.setSenha(veterinario.getCredencial().getSenha());
+                novaCredencial.setSenha(passwords.encode(veterinario.getCredencial().getSenha()));
                 novaCredencial.setVeterinario(vetAtual);
                 vetAtual.setCredencial(novaCredencial);
             }

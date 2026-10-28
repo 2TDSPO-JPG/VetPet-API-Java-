@@ -50,4 +50,7 @@ public class PetController {
     @DeleteMapping("/deletar-pet-code-")
     public String deletarPetPorPetCode(@RequestParam String petCode){return petService.deletarPetPorPetCode(petCode);}
 
+
+    @GetMapping("/buscar-por-tutor") public List<PetDto> porTutor(@RequestParam String email) { return petService.porTutorEmail(email); }
+    @GetMapping("/buscar-por-tutor-id") public List<PetDto> porTutorId(@RequestParam Long id) { return petService.porTutorId(id); }
 }

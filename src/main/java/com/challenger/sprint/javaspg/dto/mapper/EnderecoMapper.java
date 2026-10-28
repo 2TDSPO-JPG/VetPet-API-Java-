@@ -8,6 +8,7 @@ import java.util.Optional;
 public class EnderecoMapper {
 
     public static EnderecoDto toDto(Optional<Endereco> endereco){
+        if (endereco.isEmpty()) return null;
         return EnderecoDto.builder().logradouro(endereco.get().getLogradouro()).numero(endereco.get().getNumero()).complemento(endereco.get().getComplemento()).bairro(endereco.get().getBairro()).cidade(endereco.get().getCidade()).estado(endereco.get().getEstado()).build();
     }
 
