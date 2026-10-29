@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT, properties={"spring.profiles.active=local", "spring.datasource.url=jdbc:h2:mem:mobileflow;DB_CLOSE_DELAY=-1"})
+@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT, properties={"spring.profiles.active=test", "spring.datasource.url=jdbc:h2:mem:mobileflow;DB_CLOSE_DELAY=-1"})
 class MobileFlowTests {
     @LocalServerPort int port;
     private final HttpClient client=HttpClient.newHttpClient();

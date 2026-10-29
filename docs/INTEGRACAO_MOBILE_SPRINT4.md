@@ -16,6 +16,27 @@ Copiar `.env.example` para `.env.local` e manter `IOT_API_URL=http://127.0.0.1:8
 
 Swagger: `http://localhost:8080/swagger-ui/index.html`. O app físico usa o IP do computador na mesma rede, porta 8080. O Java encaminha análises ao Python na porta 8000; a chave Gemini fica no Python.
 
+## Oracle no ambiente local
+
+O driver Oracle JDBC está incluído no projeto. Para usar um esquema Oracle existente,
+preencher as propriedades `spring.datasource.*` e `spring.jpa.database-platform`
+em `.env.local` conforme o bloco comentado em `.env.example`, mantendo o perfil `local`.
+As propriedades desse arquivo substituem os padrões H2. O perfil padrão SQL Server
+continua disponível para a implantação da equipe.
+
+Usar `spring.jpa.hibernate.ddl-auto=validate` na conexão inicial: a aplicação verifica
+se as tabelas e colunas existentes correspondem às entidades, sem alterar o esquema.
+Se houver incompatibilidade, revisar uma migração específica antes de habilitar escritas
+ou atualização automática de estrutura. A troca de banco não transfere os usuários
+nem os pets que foram cadastrados no H2.
+
+Após alterar o banco ou o token interno, parar as APIs e iniciá-las novamente.
+Mudanças de dependências exigem recompilar com `.\mvnw.cmd package` antes de usar
+o iniciador conjunto, que executa o JAR de `target/`.
+
+Os testes automatizados usam o perfil `test`, com H2 em memória e configurações
+isoladas. Não importam as credenciais de `.env.local`.
+
 ## Perfis e segurança
 
 O perfil padrão usa SQL Server com `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` e `SPRING_DATASOURCE_PASSWORD`. Administrador por `APP_ADMIN_USER`/`APP_ADMIN_PASSWORD`. Configure essas variáveis antes de iniciar sem o perfil local. O ambiente SQL Server hospedado não foi testado nesta preparação.
